@@ -7,6 +7,7 @@ import config
 
 from engine.logger import get_logger
 from net_util import SAGate
+from collections import OrderedDict
 
 logger = get_logger()
 
@@ -18,6 +19,154 @@ def conv3x3(in_planes, out_planes, stride=1):
     """3x3 convolution with padding"""
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
                      padding=1, bias=False)
+
+
+class DualBasicBlock(nn.Module):
+    expansion = 1
+
+    def __init__(self, inplanes, planes, stride=1, norm_layer=None,
+                 bn_eps=1e-5, bn_momentum=0.1, downsample=None, inplace=True):
+        super(DualBasicBlock, self).__init__()
+        self.conv1 = conv3x3(inplanes, planes, stride)
+        self.bn1 = norm_layer(planes, eps=bn_eps, momentum=bn_momentum)
+        self.relu = nn.ReLU(inplace=inplace)
+        self.relu_inplace = nn.ReLU(inplace=True)
+        self.conv2 = conv3x3(planes, planes)
+        self.bn2 = norm_layer(planes, eps=bn_eps, momentum=bn_momentum)
+
+        self.depth_conv1 = conv3x3(inplanes, planes, stride)
+        self.depth_bn1 = norm_layer(planes, eps=bn_eps, momentum=bn_momentum)
+        self.depth_relu = nn.ReLU(inplace=inplace)
+        self.depth_relu_inplace = nn.ReLU(inplace=True)
+        self.depth_conv2 = conv3x3(planes, planes)
+        self.depth_bn2 = norm_layer(planes, eps=bn_eps, momentum=bn_momentum)
+
+        self.downsample = downsample
+        self.depth_downsample = downsample
+
+        self.stride = stride
+        self.inplace = inplace
+
+    def forward(self, x):
+        #first path
+        x1 = x[0]
+
+        residual1 = x1
+
+        out1 = self.conv1(x1)
+        out1 = self.bn1(out1)
+        out1 = self.relu(out1)
+
+        out1 = self.conv2(out1)
+        out1 = self.bn2(out1)
+
+        if self.downsample is not None:
+            residual1 = self.downsample(x1)
+
+        #second path
+        x2 = x[1]
+        residual2 = x2
+
+        out2 = self.depth_conv1(x2)
+        out2 = self.depth_bn1(out2)
+        out2 = self.depth_relu(out2)
+
+        out2 = self.depth_conv2(out2)
+        out2 = self.depth_bn2(out2)
+
+        if self.depth_downsample is not None:
+            residual2 = self.depth_downsample(x2)
+
+        out1 += residual1
+        out2 += residual2
+
+        out1 = self.relu_inplace(out1)
+        out2 = self.relu_inplace(out2)
+
+        return [out1, out2]
+
+
+class DualBottleneck(nn.Module):
+    expansion = 4
+
+    def __init__(self, inplanes, planes, stride=1,
+                 norm_layer=None, bn_eps=1e-5, bn_momentum=0.1,
+                 downsample=None, inplace=True):
+        super(DualBottleneck, self).__init__()
+        self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
+        self.bn1 = norm_layer(planes, eps=bn_eps, momentum=bn_momentum)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
+                               padding=1, bias=False)
+        self.bn2 = norm_layer(planes, eps=bn_eps, momentum=bn_momentum)
+        self.conv3 = nn.Conv2d(planes, planes * self.expansion, kernel_size=1,
+                               bias=False)
+        self.bn3 = norm_layer(planes * self.expansion, eps=bn_eps,
+                              momentum=bn_momentum)
+        self.relu = nn.ReLU(inplace=inplace)
+        self.relu_inplace = nn.ReLU(inplace=True)
+        self.downsample = downsample
+
+
+        self.depth_conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
+        self.depth_bn1 = norm_layer(planes, eps=bn_eps, momentum=bn_momentum)
+        self.depth_conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
+                               padding=1, bias=False)
+        self.depth_bn2 = norm_layer(planes, eps=bn_eps, momentum=bn_momentum)
+        self.depth_conv3 = nn.Conv2d(planes, planes * self.expansion, kernel_size=1,
+                               bias=False)
+        self.depth_bn3 = norm_layer(planes * self.expansion, eps=bn_eps,
+                              momentum=bn_momentum)
+        self.depth_relu = nn.ReLU(inplace=inplace)
+        self.depth_relu_inplace = nn.ReLU(inplace=True)
+        self.depth_downsample = downsample
+
+
+        self.stride = stride
+        self.inplace = inplace
+
+    def forward(self, x):
+        # first path
+        x1 = x[0]
+        residual1 = x1
+
+        out1 = self.conv1(x1)
+        out1 = self.bn1(out1)
+        out1 = self.relu(out1)
+
+        out1 = self.conv2(out1)
+        out1 = self.bn2(out1)
+        out1 = self.relu(out1)
+
+        out1 = self.conv3(out1)
+        out1 = self.bn3(out1)
+
+        if self.downsample is not None:
+            residual1 = self.downsample(x1)
+
+        # second path
+        x2 = x[1]
+        residual2 = x2
+
+        out2 = self.depth_conv1(x2)
+        out2 = self.depth_bn1(out2)
+        out2 = self.depth_relu(out2)
+
+        out2 = self.depth_conv2(out2)
+        out2 = self.depth_bn2(out2)
+        out2 = self.depth_relu(out2)
+
+        out2 = self.depth_conv3(out2)
+        out2 = self.depth_bn3(out2)
+
+        if self.depth_downsample is not None:
+            residual2 = self.depth_downsample(x2)
+
+        out1 += residual1
+        out2 += residual2
+        out1 = self.relu_inplace(out1)
+        out2 = self.relu_inplace(out2)
+
+        return [out1, out2]
 
 
 class DualResNet(nn.Module):
@@ -110,3 +259,147 @@ class DualResNet(nn.Module):
 
         return nn.Sequential(*layers)
 
+    def forward(self, mono_tensor, depth_tensor):
+        x1 = self.conv1(mono_tensor)
+        x1 = self.bn1(x1)
+        x1 = self.relu(x1)
+        x1 = self.maxpool(x1)
+
+        x2 = self.depth_conv1(depth_tensor)
+        x2 = self.depth_bn1(x2)
+        x2 = self.depth_relu(x2)
+        x2 = self.depth_maxpool(x2)
+
+        x = [x1, x2]
+        blocks = []
+        merges = []
+
+        x = self.layer1(x)
+        x, merge = self.sagates[0](x)
+        blocks.append(x)
+        merges.append(merge)
+
+        x = self.layer2(x)
+        x, merge = self.sagates[1](x)
+        blocks.append(x)
+        merges.append(merge)
+
+        x = self.layer3(x)
+        x, merge = self.sagates[2](x)
+        blocks.append(x)
+        merges.append(merge)
+
+        x = self.layer4(x)
+        x, merge = self.sagates[3](x)
+        blocks.append(x)
+        merges.append(merge)
+
+        #blocks[3], merge[3] is original output in paper of charlesCXK
+        #Extract feature map in this class
+        return blocks, merges
+
+def load_dualpath_model(model, model_file, is_restore=False):
+    # load raw state_dict
+    t_start = time.time()
+    if isinstance(model_file, str):
+        raw_state_dict = torch.load(model_file)
+
+
+        if 'model' in raw_state_dict.keys():
+            raw_state_dict = raw_state_dict['model']
+    else:
+        raw_state_dict = model_file
+    # copy to  depth backbone
+    state_dict = {}
+    for k, v in raw_state_dict.items():
+        state_dict[k.replace('.bn.', '.')] = v
+        if k.find('conv1') >= 0:
+            state_dict[k] = v
+            state_dict[k.replace('conv1', 'depth_conv1')] = v
+        if k.find('conv2') >= 0:
+            state_dict[k] = v
+            state_dict[k.replace('conv2', 'depth_conv2')] = v
+        if k.find('conv3') >= 0:
+            state_dict[k] = v
+            state_dict[k.replace('conv3', 'depth_conv3')] = v
+        if k.find('bn1') >= 0:
+            state_dict[k] = v
+            state_dict[k.replace('bn1', 'depth_bn1')] = v
+        if k.find('bn2') >= 0:
+            state_dict[k] = v
+            state_dict[k.replace('bn2', 'depth_bn2')] = v
+        if k.find('bn3') >= 0:
+            state_dict[k] = v
+            state_dict[k.replace('bn3', 'depth_bn3')] = v
+        if k.find('downsample') >= 0:
+            state_dict[k] = v
+            state_dict[k.replace('downsample', 'depth_downsample')] = v
+    t_ioend = time.time()
+
+    if is_restore:
+        new_state_dict = OrderedDict()
+        for k, v in state_dict.items():
+            name = 'module.' + k
+            new_state_dict[name] = v
+        state_dict = new_state_dict
+
+    model.load_state_dict(state_dict, strict=False)
+    # ckpt_keys = set(state_dict.keys())
+    # own_keys = set(model.state_dict().keys())
+    # missing_keys = own_keys - ckpt_keys
+    # unexpected_keys = ckpt_keys - own_keys
+    #
+    # if len(missing_keys) > 0:
+    #     logger.warning('Missing key(s) in state_dict: {}'.format(
+    #         ', '.join('{}'.format(k) for k in missing_keys)))
+    #
+    # if len(unexpected_keys) > 0:
+    #     logger.warning('Unexpected key(s) in state_dict: {}'.format(
+    #         ', '.join('{}'.format(k) for k in unexpected_keys)))
+
+    del state_dict
+    t_end = time.time()
+    logger.info(
+        "Load model, Time usage:\n\tIO: {}, initialize parameters: {}".format(
+            t_ioend - t_start, t_end - t_ioend))
+
+    return model
+
+def resnet18(pretrained_model=None, **kwargs):
+    model = DualResNet(DualBasicBlock, [2, 2, 2, 2], **kwargs)
+
+    if pretrained_model is not None:
+        model = load_dualpath_model(model, pretrained_model)
+    return model
+
+
+def resnet34(pretrained_model=None, **kwargs):
+    model = DualResNet(DualBasicBlock, [3, 4, 6, 3], **kwargs)
+
+    if pretrained_model is not None:
+        model = load_dualpath_model(model, pretrained_model)
+    return model
+
+
+def resnet50(pretrained_model=None, **kwargs):
+    model = DualResNet(DualBottleneck, [3, 4, 6, 3], **kwargs)
+
+    if pretrained_model is not None:
+        model = load_dualpath_model(model, pretrained_model)
+    return model
+
+
+def resnet101(pretrained_model=None, **kwargs):
+    model = DualResNet(DualBottleneck, [3, 4, 23, 3], **kwargs)
+
+    if pretrained_model is not None:
+        model = load_dualpath_model(model, pretrained_model)
+    return model
+
+
+def resnet152(pretrained_model=None, **kwargs):
+    model = DualResNet(DualBottleneck, [3, 8, 36, 3], **kwargs)
+
+    if pretrained_model is not None:
+        model = load_dualpath_model(model, pretrained_model)
+    return model
