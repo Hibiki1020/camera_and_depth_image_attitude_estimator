@@ -3,7 +3,7 @@ image_name="mono_and_depth_image_attitude_estimator"
 tag_name="docker"
 script_dir=$(cd $(dirname $0); pwd)
 
-docker run -it \
+docker run -it --rm\
     --net="host" \
     --gpus all \
 	--privileged \

@@ -8,6 +8,8 @@ from utils.engine.logger import get_logger
 from common.net_util import SAGate
 from collections import OrderedDict
 
+import pickle
+
 logger = get_logger()
 
 
@@ -169,7 +171,8 @@ class DualBottleneck(nn.Module):
 
 
 class DualResNet(nn.Module):
-    def __init__(self, block, layers, norm_layer=nn.BatchNorm2d, bn_eps=1e-5, bn_momentum=0.1, deep_stem=False, stem_width=32, inplace=True):
+    def __init__(self, block, layers, norm_layer=nn.BatchNorm2d, bn_eps=1e-5,
+                 bn_momentum=0.1, deep_stem=False, stem_width=32, inplace=True):
         self.inplanes = stem_width * 2 if deep_stem else 64
         super(DualResNet, self).__init__()
 
@@ -300,8 +303,14 @@ class DualResNet(nn.Module):
 def load_dualpath_model(model, model_file, is_restore=False):
     # load raw state_dict
     t_start = time.time()
+    
+    #pickle.load = pickle.partial(pickle.load, encoding="latin1")
+    #pickle.Unpickler = pickle.partial(pickle.Unpickler, encoding="latin1")
+    
     if isinstance(model_file, str):
-        raw_state_dict = torch.load(model_file)
+        #raw_state_dict = torch.load(model_file)
+        with open(model_file, "rb") as f:
+            raw_state_dict = pickle.load(f)
 
 
         if 'model' in raw_state_dict.keys():
