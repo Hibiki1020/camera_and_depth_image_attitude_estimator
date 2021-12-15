@@ -23,6 +23,8 @@ from common import dataset_mod
 from common import make_datalist_mod
 from common import data_transform_mod
 
+from common import network_mod
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("./train.py")
 
@@ -97,3 +99,5 @@ if __name__ == '__main__':
         index_dict_path = index_csv_path,
         dim_fc_out = dim_fc_out
     )
+
+    net = network_mod.Network(dim_fc_out)

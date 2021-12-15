@@ -189,7 +189,7 @@ class DualResNet(nn.Module):
                           padding=1,
                           bias=False),
             )
-            self.depth_conv1  = nn.Sequential(
+            self.depth_conv1 = nn.Sequential(
                 nn.Conv2d(1, stem_width, kernel_size=3, stride=2, padding=1,
                           bias=False),
                 norm_layer(stem_width, eps=bn_eps, momentum=bn_momentum),
