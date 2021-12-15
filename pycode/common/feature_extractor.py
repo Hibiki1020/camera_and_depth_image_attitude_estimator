@@ -3,13 +3,12 @@ import functools
 import time
 import torch
 import torch.nn as nn
-import config
 
-from engine.logger import get_logger
-from net_util import SAGate
+#from engine.logger import get_logger
+from common.net_util import SAGate
 from collections import OrderedDict
 
-logger = get_logger()
+#logger = get_logger()
 
 
 __all__ = ['DualResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
@@ -17,7 +16,7 @@ __all__ = ['DualResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
 
 def conv3x3(in_planes, out_planes, stride=1):
     """3x3 convolution with padding"""
-    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
+    return nn.Conv2d(in_planes, out_planes, kerSSSnel_size=3, stride=stride,
                      padding=1, bias=False)
 
 
@@ -176,7 +175,7 @@ class DualResNet(nn.Module):
 
         if deep_stem:
             self.conv1 = nn.Sequential(
-                nn.Conv2d(1, stem_width, kernel_size=3, stride=2, padding=1,
+                nn.Conv2d(3, stem_width, kernel_size=3, stride=2, padding=1,
                           bias=False),
                 norm_layer(stem_width, eps=bn_eps, momentum=bn_momentum),
                 nn.ReLU(inplace=inplace),
@@ -190,7 +189,7 @@ class DualResNet(nn.Module):
                           bias=False),
             )
             self.depth_conv1 = nn.Sequential(
-                nn.Conv2d(1, stem_width, kernel_size=3, stride=2, padding=1,
+                nn.Conv2d(3, stem_width, kernel_size=3, stride=2, padding=1,
                           bias=False),
                 norm_layer(stem_width, eps=bn_eps, momentum=bn_momentum),
                 nn.ReLU(inplace=inplace),
@@ -204,9 +203,9 @@ class DualResNet(nn.Module):
                           bias=False),
             )
         else:
-            self.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3,
+            self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
                                    bias=False)
-            self.depth_conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3,
+            self.depth_conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
                                    bias=False)
 
         self.bn1 = norm_layer(stem_width * 2 if deep_stem else 64, eps=bn_eps,

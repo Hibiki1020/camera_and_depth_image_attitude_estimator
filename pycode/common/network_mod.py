@@ -1,7 +1,10 @@
-import feature_extractor
-import net_util
-import classification_fc_layer
-import num_regression_fc_layer
+import sys
+sys.dont_write_bytecode = True
+
+from common import feature_extractor
+from common import net_util
+from common import classification_fc_layer
+from common import num_regression_fc_layer
 
 import torch
 from torchvision import models
@@ -9,9 +12,11 @@ import torch.nn as nn
 import torch.nn.functional as nn_functional
 
 class Network(nn.Module):
-    def __init__(self, dim_fc_out):
+    def __init__(self, dim_fc_out, norm_layer, pretrained_model):
         self.dim_fc_out = dim_fc_out
-        self.feature_extractor = feature_extractor.DualResNet()
+        #ResNet101
+        self.feature_extractor = feature_extractor.resnet101(pretrained_model, norm_layer=norm_layer,
+                                bn_eps=1e-5, bn_momentum=0.1, deep_stem=True, stem_width=64)
         self.fully_connected = classification_fc_layer.ClassificationType()
 
     def forward(self, mono, depth):

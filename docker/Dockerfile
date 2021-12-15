@@ -37,7 +37,8 @@ RUN pip install \
 
 RUN pip install torchsummary==1.5.1 \
 		tqdm \
-		matplotlib
+		matplotlib \
+		pyyaml
 
 ##### NO cache #####
 ARG CACHEBUST=1

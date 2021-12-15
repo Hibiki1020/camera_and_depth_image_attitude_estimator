@@ -54,6 +54,8 @@ if __name__ == '__main__':
     index_csv_path = CFG["index_csv_path"]
     multiGPU = int(CFG["multiGPU"])
 
+    pretrained_model = CFG["pretrained_model"]
+
     train_sequences = CFG["train"]
     valid_sequences = CFG["valid"]
 
@@ -100,4 +102,4 @@ if __name__ == '__main__':
         dim_fc_out = dim_fc_out
     )
 
-    net = network_mod.Network(dim_fc_out)
+    net = network_mod.Network(dim_fc_out, norm_layer=nn.BatchNorm2d,pretrained_model=pretrained_model)

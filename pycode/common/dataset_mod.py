@@ -72,7 +72,10 @@ class ClassOriginalDataset(data.Dataset):
         pitch_list = self.float_to_array(pitch_float)
 
         mono_pil = Image.open(mono_path)
+        mono_pil = mono_pil.convert("RGB")
+
         depth_pil = Image.open(depth_path)
+        depth_pil = depth_pil.convert("RGB")
 
         roll_numpy = np.array(roll_list)
         pitch_numpy = np.array(pitch_list)

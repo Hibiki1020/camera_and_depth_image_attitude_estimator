@@ -1,9 +1,6 @@
 import functools
-import functools
-import time
 import torch
 import torch.nn as nn
-import config
 import torch.nn.functional as nn_functional
 
 class ClassificationType(nn.Module):
