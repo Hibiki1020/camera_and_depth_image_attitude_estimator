@@ -1,0 +1,22 @@
+save_top_path: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/test"
+weights_path: "/weights"
+log_path: "/log"
+graph_path: "/graph"
+
+train:
+  - "/home/ssd_dir/rgbd_airsim_image/image10000_2021_12_10"
+valid:
+  - "/home/ssd_dir/rgbd_airsim_image/image10000_2021_12_10_2"
+
+csv_name: "data_list.csv"
+
+index_csv_path: "/home/pycode/mono_and_depth_image_attitude_estimator/index_dict/index_dict_-30_30_range_step1deg.csv"
+
+multiGPU: 0 #1 is ture
+
+hyperparameter:
+  original_size: 672
+  resize: 224
+  mean_element: 0.5
+  std_element: 0.5
+  dim_fc_out: 61

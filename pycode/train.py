@@ -61,6 +61,7 @@ if __name__ == '__main__':
     std_element = CFG["hyperparameter"]["std_element"]
     original_size = CFG["hyperparameter"]["original_size"]
 
+    '''
     try:
         print("Copy files to %s for further reference." % log_path)
         copyfile(FLAGS.train_cfg, "/train_config.yaml")
@@ -68,7 +69,8 @@ if __name__ == '__main__':
         print(e)
         print("Error copying files, check permissions. Exiting....")
         quit()
-    
+    '''
+    print("Load Training Dataset")
     train_dataset = dataset_mod.ClassOriginalDataset(
         data_list = make_datalist_mod.makeMultiDataList(train_sequences, csv_name),
         transform = data_transform_mod.DataTransform(
@@ -82,6 +84,7 @@ if __name__ == '__main__':
         dim_fc_out = dim_fc_out
     )
 
+    print("Load Valid Dataset")
     valid_dataset = dataset_mod.ClassOriginalDataset(
         data_list = make_datalist_mod.makeMultiDataList(valid_sequences, csv_name),
         transform = data_transform_mod.DataTransform(
