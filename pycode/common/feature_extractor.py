@@ -4,11 +4,11 @@ import time
 import torch
 import torch.nn as nn
 
-#from engine.logger import get_logger
+from utils.engine.logger import get_logger
 from common.net_util import SAGate
 from collections import OrderedDict
 
-#logger = get_logger()
+logger = get_logger()
 
 
 __all__ = ['DualResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
@@ -16,7 +16,7 @@ __all__ = ['DualResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
 
 def conv3x3(in_planes, out_planes, stride=1):
     """3x3 convolution with padding"""
-    return nn.Conv2d(in_planes, out_planes, kerSSSnel_size=3, stride=stride,
+    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
                      padding=1, bias=False)
 
 
