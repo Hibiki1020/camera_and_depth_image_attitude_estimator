@@ -3,6 +3,7 @@ import functools
 import time
 import torch
 import torch.nn as nn
+import torchvision.models as models
 
 from utils.engine.logger import get_logger
 from common.net_util import SAGate
@@ -211,9 +212,13 @@ class DualResNet(nn.Module):
             self.depth_conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
                                    bias=False)
 
-        self.bn1 = norm_layer(stem_width * 2 if deep_stem else 64, eps=bn_eps,
+        #self.bn1 = norm_layer(stem_width * 2 if deep_stem else 64, eps=bn_eps,
+        #                      momentum=bn_momentum)
+        self.bn1 = norm_layer(64, eps=bn_eps,
                               momentum=bn_momentum)
-        self.depth_bn1 = norm_layer(stem_width * 2 if deep_stem else 64, eps=bn_eps,
+        #self.depth_bn1 = norm_layer(stem_width * 2 if deep_stem else 64, eps=bn_eps,
+        #                      momentum=bn_momentum)
+        self.depth_bn1 = norm_layer(64, eps=bn_eps,
                               momentum=bn_momentum)
         self.relu = nn.ReLU(inplace=inplace)
         self.depth_relu = nn.ReLU(inplace=inplace)
@@ -304,14 +309,8 @@ def load_dualpath_model(model, model_file, is_restore=False):
     # load raw state_dict
     t_start = time.time()
     
-    #pickle.load = pickle.partial(pickle.load, encoding="latin1")
-    #pickle.Unpickler = pickle.partial(pickle.Unpickler, encoding="latin1")
-    
     if isinstance(model_file, str):
-        #raw_state_dict = torch.load(model_file)
-        with open(model_file, "rb") as f:
-            raw_state_dict = pickle.load(f)
-
+        raw_state_dict = torch.load(model_file)
 
         if 'model' in raw_state_dict.keys():
             raw_state_dict = raw_state_dict['model']
@@ -351,7 +350,11 @@ def load_dualpath_model(model, model_file, is_restore=False):
             new_state_dict[name] = v
         state_dict = new_state_dict
 
+    #print(model)
+
     model.load_state_dict(state_dict, strict=False)
+    
+    
     # ckpt_keys = set(state_dict.keys())
     # own_keys = set(model.state_dict().keys())
     # missing_keys = own_keys - ckpt_keys

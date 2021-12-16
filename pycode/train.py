@@ -1,3 +1,4 @@
+from random import shuffle
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import time
@@ -16,6 +17,7 @@ import torch
 from torchvision import models
 import torch.nn as nn
 import torch.optim as optim
+
 from tensorboardX import SummaryWriter
 
 import sys
@@ -101,5 +103,19 @@ if __name__ == '__main__':
         index_dict_path = index_csv_path,
         dim_fc_out = dim_fc_out
     )
+
+    train_dataloader = torch.utils.data.DataLoader(
+        train_dataset,
+        batch_size = 16,
+        shuffle=True
+    )
+
+    valid_dataloader = torch.utils.data.DataLoader(
+        valid_dataset,
+        batch_size = 16,
+        shuffle=True
+    )
+
+    dataloaders_dict = {"train":train_dataloader, "valid":valid_dataloader}
 
     net = network_mod.Network(dim_fc_out, norm_layer=nn.BatchNorm2d,pretrained_model=pretrained_model)

@@ -12,7 +12,7 @@ csv_name: "data_list.csv"
 
 index_csv_path: "/home/pycode/mono_and_depth_image_attitude_estimator/index_dict/index_dict_-30_30_range_step1deg.csv"
 
-pretrained_model: "/home/pycode/mono_and_depth_image_attitude_estimator/weights/resnet101_v1c.pth"
+pretrained_model: "/home/pycode/mono_and_depth_image_attitude_estimator/weights/resnet101-63fe2227.pth"
 
 multiGPU: 0 #1 is ture
 
