@@ -13,11 +13,17 @@ import torch.nn.functional as nn_functional
 
 class Network(nn.Module):
     def __init__(self, dim_fc_out, norm_layer, pretrained_model):
+        super(Network, self).__init__()
         self.dim_fc_out = dim_fc_out
         #ResNet101
-        self.feature_extractor = feature_extractor.resnet101(pretrained_model, norm_layer=norm_layer,
-                                bn_eps=1e-5, bn_momentum=0.1, deep_stem=True, stem_width=64)
-        self.fully_connected = classification_fc_layer.ClassificationType()
+        print("Load ResNet")
+        self.feature_extractor = feature_extractor.resnet101(pretrained_model, norm_layer=norm_layer, bn_eps=1e-5, bn_momentum=0.1, deep_stem=True, stem_width=64)
+        
+        print("Load Classification Layer")
+        self.fully_connected = classification_fc_layer.ClassificationType(dim_fc_out, 0.1)
+
+        #print(self.feature_extractor)
+        #print(self.fully_connected)
 
     def forward(self, mono, depth):
         blocks, merges = self.feature_extractor(mono, depth)

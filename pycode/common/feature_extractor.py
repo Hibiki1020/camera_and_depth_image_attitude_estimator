@@ -95,6 +95,7 @@ class DualBottleneck(nn.Module):
                  norm_layer=None, bn_eps=1e-5, bn_momentum=0.1,
                  downsample=None, inplace=True):
         super(DualBottleneck, self).__init__()
+        #print(inplanes)
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
         self.bn1 = norm_layer(planes, eps=bn_eps, momentum=bn_momentum)
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
@@ -212,28 +213,26 @@ class DualResNet(nn.Module):
             self.depth_conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
                                    bias=False)
 
-        #self.bn1 = norm_layer(stem_width * 2 if deep_stem else 64, eps=bn_eps,
-        #                      momentum=bn_momentum)
-        self.bn1 = norm_layer(64, eps=bn_eps,
-                              momentum=bn_momentum)
-        #self.depth_bn1 = norm_layer(stem_width * 2 if deep_stem else 64, eps=bn_eps,
-        #                      momentum=bn_momentum)
-        self.depth_bn1 = norm_layer(64, eps=bn_eps,
-                              momentum=bn_momentum)
+        #self.bn1 = norm_layer(stem_width * 2 if deep_stem else 64, eps=bn_eps, momentum=bn_momentum)
+        self.bn1 = norm_layer(64, eps=bn_eps, momentum=bn_momentum)
+        #self.depth_bn1 = norm_layer(stem_width * 2 if deep_stem else 64, eps=bn_eps, momentum=bn_momentum)
+        self.depth_bn1 = norm_layer(64, eps=bn_eps, momentum=bn_momentum)
+
+
         self.relu = nn.ReLU(inplace=inplace)
         self.depth_relu = nn.ReLU(inplace=inplace)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.depth_maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, norm_layer, 64, layers[0],
+        self.layer1 = self._make_layer(1,block, norm_layer, 64, layers[0],
                                        inplace,
                                        bn_eps=bn_eps, bn_momentum=bn_momentum)
-        self.layer2 = self._make_layer(block, norm_layer, 128, layers[1],
+        self.layer2 = self._make_layer(2,block, norm_layer, 128, layers[1],
                                        inplace, stride=2,
                                        bn_eps=bn_eps, bn_momentum=bn_momentum)
-        self.layer3 = self._make_layer(block, norm_layer, 256, layers[2],
+        self.layer3 = self._make_layer(3,block, norm_layer, 256, layers[2],
                                        inplace, stride=2,
                                        bn_eps=bn_eps, bn_momentum=bn_momentum)
-        self.layer4 = self._make_layer(block, norm_layer, 512, layers[3],
+        self.layer4 = self._make_layer(4,block, norm_layer, 512, layers[3],
                                        inplace, stride=2,
                                        bn_eps=bn_eps, bn_momentum=bn_momentum)
 
@@ -244,25 +243,42 @@ class DualResNet(nn.Module):
             SAGate(in_planes=2048, out_planes=2048, bn_momentum=bn_momentum)
         ])
 
-    def _make_layer(self, block, norm_layer, planes, blocks, inplace=True,
+    def _make_layer(self, number, block, norm_layer, planes, blocks, inplace=True,
                     stride=1, bn_eps=1e-5, bn_momentum=0.1):
+        
         downsample = None
+        
+
         if stride != 1 or self.inplanes != planes * block.expansion:
-            downsample = nn.Sequential(
-                nn.Conv2d(self.inplanes, planes * block.expansion,
-                          kernel_size=1, stride=stride, bias=False),
-                norm_layer(planes * block.expansion, eps=bn_eps,
+            if number==1:
+                downsample = nn.Sequential(
+                    nn.Conv2d(64, 256,
+                            kernel_size=1, stride=stride, bias=False),
+                    norm_layer(256, eps=bn_eps,
                            momentum=bn_momentum),
-            )
+                )
+            else:
+                downsample = nn.Sequential(
+                    nn.Conv2d(self.inplanes, planes * block.expansion,
+                            kernel_size=1, stride=stride, bias=False),
+                    norm_layer(planes * block.expansion, eps=bn_eps,
+                           momentum=bn_momentum),
+                )
 
         layers = []
-        layers.append(block(self.inplanes, planes, stride, norm_layer, bn_eps,
-                            bn_momentum, downsample, inplace))
+        #print(self.inplanes)
+        #print(planes)
+        if number==1:
+            layers.append(block( planes, planes, stride, norm_layer, bn_eps, bn_momentum, downsample, inplace))
+        else:
+            layers.append(block(self.inplanes, planes, stride, norm_layer, bn_eps, bn_momentum, downsample, inplace))
+        
         self.inplanes = planes * block.expansion
         for i in range(1, blocks):
-            layers.append(block(self.inplanes, planes,
-                                norm_layer=norm_layer, bn_eps=bn_eps,
-                                bn_momentum=bn_momentum, inplace=inplace))
+            if number==1:
+                layers.append(block(self.inplanes, planes, norm_layer=norm_layer, bn_eps=bn_eps, bn_momentum=bn_momentum, inplace=inplace))
+            else:
+                layers.append(block(self.inplanes, planes, norm_layer=norm_layer, bn_eps=bn_eps, bn_momentum=bn_momentum, inplace=inplace))
 
         return nn.Sequential(*layers)
 

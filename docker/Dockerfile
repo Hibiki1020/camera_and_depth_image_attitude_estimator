@@ -46,6 +46,9 @@ ARG CACHEBUST=1
 RUN mkdir /home/pycode && \
 	cd /home/pycode && \
     git clone https://github.com/Hibiki1020/mono_and_depth_image_attitude_estimator.git && \
-    cd /home/pycode/mono_and_depth_image_attitude_estimator
+    cd /home/pycode/mono_and_depth_image_attitude_estimator && \
+	cd /home/pycode/mono_and_depth_image_attitude_estimator/weights && \
+	wget https://download.pytorch.org/models/resnet101-63fe2227.pth && \
+	cd /home/pycode/mono_and_depth_image_attitude_estimator
 
 WORKDIR /home/pycode/mono_and_depth_image_attitude_estimator
