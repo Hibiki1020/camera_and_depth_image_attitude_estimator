@@ -163,9 +163,20 @@ class Trainer:
         return optimizer
 
     def saveParam(self):
-        save_path = self.weights_path + "weights.pth"
+        save_path = self.weights_path + "weight.pth"
         torch.save(self.net.state_dict(), save_path)
-        print("Saved Weight") 
+        print("Saved Weight")
+
+    def saveGraph(self, record_loss_train, record_loss_val):
+        graph = plt.figure()
+        plt.plot(range(len(record_loss_train)), record_loss_train, label="Training")
+        plt.plot(range(len(record_loss_val)), record_loss_val, label="Validation")
+        plt.legend()
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss [m^2/s^4]")
+        plt.title("loss: train=" + str(record_loss_train[-1]) + ", val=" + str(record_loss_val[-1]))
+        graph.savefig(self.graph_path + "log" + ".jpg")
+        plt.show()
 
     def train(self):
         print("Start Training")
@@ -239,10 +250,13 @@ class Trainer:
             if record_train_loss and record_valid_loss:
                 writer.add_scalars("Loss/train_and_val", {"train": record_train_loss[-1], "val": record_valid_loss[-1]}, epoch)
 
+        mins = (time.time() - start_clock) // 60
+        secs = (time.time() - start_clock) % 60
+        print("Training Time: ", mins, "[min]", secs, "[sec]")
+        
         writer.close()
         self.saveParam()
-
-
+        self.saveGraph()
 
 
 if __name__ == '__main__':
