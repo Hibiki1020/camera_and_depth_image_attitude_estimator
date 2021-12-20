@@ -26,8 +26,8 @@ hyperparameter:
   batch_size: 128
   num_epochs: 10
   optimizer_name: "Adam"
-  lr_resnet: 1e-5
-  lr_roll_fc: 1e-5
-  lr_pitch_fc: 1e-5
+  lr_resnet: 1e-4
+  lr_roll_fc: 1e-4
+  lr_pitch_fc: 1e-4
   weight_decay: 0.01
-  alpha: 1e-5
+  alpha: 1e-4

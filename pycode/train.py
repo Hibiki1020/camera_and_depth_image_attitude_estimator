@@ -109,7 +109,7 @@ class Trainer:
             train_dataset,
             batch_size = 16,
             shuffle=True,
-            num_workers = 4,
+            num_workers = 2,
             pin_memory =True
         )
 
@@ -117,7 +117,7 @@ class Trainer:
             valid_dataset,
             batch_size = 16,
             shuffle=True,
-            num_workers = 4,
+            num_workers = 2,
             pin_memory = True
         )
 
@@ -127,7 +127,7 @@ class Trainer:
 
     def getNetwork(self, net):
         print("Loading Network")
-        print(net)
+        #print(net)
         net = net.to(self.device)
         if self.multiGPU == 1 and self.device == 'cuda':
             net = nn.DataParallel(net)
