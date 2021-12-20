@@ -108,13 +108,17 @@ class Trainer:
         train_dataloader = torch.utils.data.DataLoader(
             train_dataset,
             batch_size = 16,
-            shuffle=True
+            shuffle=True,
+            num_workers = 4,
+            pin_memory =True
         )
 
         valid_dataloader = torch.utils.data.DataLoader(
             valid_dataset,
             batch_size = 16,
-            shuffle=True
+            shuffle=True,
+            num_workers = 4,
+            pin_memory = True
         )
 
         dataloaders_dict = {"train":train_dataloader, "valid":valid_dataloader}
@@ -130,6 +134,7 @@ class Trainer:
             cudnn.benchmark = True
             print("Training on multiGPU device")
         else:
+            cudnn.benchmark = True
             print("Training on single GPU device")
         
         return net

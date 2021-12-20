@@ -24,7 +24,7 @@ hyperparameter:
   std_element: 0.5
   dim_fc_out: 61
   batch_size: 128
-  num_epochs: 20
+  num_epochs: 10
   optimizer_name: "Adam"
   lr_resnet: 1e-5
   lr_roll_fc: 1e-5
