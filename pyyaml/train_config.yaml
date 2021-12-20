@@ -23,4 +23,11 @@ hyperparameter:
   mean_element: 0.5
   std_element: 0.5
   dim_fc_out: 61
-  batch_size: 16
+  batch_size: 128
+  num_epochs: 50
+  optimizer_name: "Adam"
+  lr_resnet: 1e-5
+  lr_roll_fc: 1e-5
+  lr_pitch_fc: 1e-5
+  weight_decay: 0.01
+  alpha: 1e-5

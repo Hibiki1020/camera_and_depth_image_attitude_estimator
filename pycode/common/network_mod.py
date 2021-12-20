@@ -37,3 +37,19 @@ class Network(nn.Module):
         torch.set_printoptions(edgeitems=10000)
 
         return logged_roll, logged_pitch, roll, pitch
+
+    def getParamValueList(self):
+        list_resnet_param_value = []
+        list_roll_fc_param_value = []
+        list_pitch_fc_param_value = []
+
+        for param_name, param_value in self.named_parameters():
+            param_value.requires_grad = True
+            if "feature_extractor" in param_name:
+                list_resnet_param_value.append(param_value)
+            if "roll_fc" in param_name:
+                list_roll_fc_param_value.append(param_value)
+            if "pitch_fc" in param_name:
+                list_pitch_fc_param_value.append(param_value)
+
+        return list_resnet_param_value, list_roll_fc_param_value, list_pitch_fc_param_value

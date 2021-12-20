@@ -48,6 +48,13 @@ class Trainer:
             std_element,
             original_size,
             batch_size,
+            num_epochs,
+            optimizer_name,
+            lr_resnet,
+            lr_roll_fc,
+            lr_pitch_fc,
+            weight_decay,
+            alpha,
             train_dataset,
             valid_dataset,
             net
@@ -69,6 +76,12 @@ class Trainer:
         self.std_element = std_element
         self.original_size = original_size
         self.batch_size = batch_size
+        self.num_epochs = num_epochs
+        self.lr_resnet = lr_resnet
+        self.lr_roll_fc = lr_roll_fc
+        self.lr_pitch_fc = lr_pitch_fc
+        self.weight_decay = weight_decay
+        self.alpha = alpha
         self.train_dataset = train_dataset
         self.valid_dataset = valid_dataset
         self.net = net
@@ -81,6 +94,7 @@ class Trainer:
         self.setRandomCondition()
         self.dataloaders_dict = self.getDataloaders(train_dataset, valid_dataset, batch_size)
         self.net = self.getNetwork(net)
+        self.optimizer = self.getOptimizer(optimizer_name, lr_resnet, lr_roll_fc, lr_pitch_fc, weight_decay)
 
     def setRandomCondition(self, keep_reproducibility=False, seed=123456789):
         if keep_reproducibility:
@@ -108,17 +122,122 @@ class Trainer:
         return dataloaders_dict
 
     def getNetwork(self, net):
-        print(net)
+        print("Loading Network")
+        #print(net)
         net = net.to(self.device)
         if self.multiGPU == 1 and self.device == 'cuda':
             net = nn.DataParallel(net)
             cudnn.benchmark = True
             print("Training on multiGPU device")
+        else:
+            print("Training on single GPU device")
         
         return net
+    
+    def getOptimizer(self, optimizer_name, lr_resnet, lr_roll_fc, lr_pitch_fc, weight_decay):
+        if self.multiGPU == 1 and self.device == 'cuda':
+            list_resnet_param_value, list_roll_fc_param_value, list_pitch_fc_param_value = self.net.module.getParamValueList()
+        elif self.multiGPU == 0:
+            list_resnet_param_value, list_roll_fc_param_value, list_pitch_fc_param_value = self.net.getParamValueList()
+
+        if optimizer_name == "SGD":
+            optimizer = optim.SGD([
+                {"params": list_resnet_param_value, "lr": lr_resnet},
+                {"params": list_roll_fc_param_value, "lr": lr_roll_fc},
+                {"params": list_pitch_fc_param_value, "lr": lr_pitch_fc}
+            ], momentum=0.9, 
+            weight_decay=self.weight_decay)
+        elif optimizer_name == "Adam":
+            optimizer = optim.Adam([
+                {"params": list_resnet_param_value, "lr": lr_resnet},
+                {"params": list_roll_fc_param_value, "lr": lr_roll_fc},
+                {"params": list_pitch_fc_param_value, "lr": lr_pitch_fc}
+            ], weight_decay=self.weight_decay)
+
+        print("optimizer: {}".format(optimizer_name))
+        return optimizer
+
+    def saveParam(self):
+        save_path = self.weights_path + "weights.pth"
+        torch.save(self.net.state_dict(), save_path)
+        print("Saved Weight") 
 
     def train(self):
         print("Start Training")
+
+        start_clock = time.time()
+
+        #Loss record
+        writer = SummaryWriter(log_dir=self.log_path+"log")
+
+        record_train_loss = []
+        record_valid_loss = []
+
+        for epoch in range(self.num_epochs):
+            print("----------------")
+            print("Epoch {}/{}".format(epoch+1, self.num_epochs))
+
+            for phase in ["train", "valid"]:
+                if phase == "train":
+                    self.net.train() #Change Training Mode
+                elif phase == "valid":
+                    self.net.eval()
+                
+                #Data Load
+                epoch_loss = 0.0
+
+                for mono_input, depth_input, label_roll, label_pitch in tqdm(self.dataloaders_dict[phase]):
+                    mono_input = mono_input.to(self.device)
+                    depth_input = depth_input.to(self.device)
+                    label_roll = label_roll.to(self.device)
+                    label_pitch = label_pitch.to(self.device)
+
+                    #print(mono_input.size())
+
+                    #Reset Gradient
+                    self.optimizer.zero_grad()
+
+                    with torch.set_grad_enabled(phase=="train"):
+                        logged_roll_inf, logged_pitch_inf, roll_inf, pitch_inf = self.net(mono_input, depth_input)
+
+                        roll_loss = torch.mean(torch.sum(-label_roll*logged_roll_inf, 1))
+                        pitch_loss = torch.mean(torch.sum(-label_pitch*logged_pitch_inf, 1))
+
+                        torch.set_printoptions(edgeitems=1000000)
+
+                        if self.device == 'cpu':
+                            l2norm = torch.tensor(0., requires_grad = True).cpu()
+                        else:
+                            l2norm = torch.tensor(0., requires_grad = True).cuda()
+
+                        for w in self.net.parameters():
+                            l2norm = l2norm + torch.norm(w)**2
+                        
+                        total_loss = roll_loss + pitch_loss + self.alpha*l2norm
+
+                        if phase == "train":
+                            total_loss.backward()
+                            self.optimizer.step()
+
+                        epoch_loss += total_loss.item() * mono_input.size(0) * depth_input.size(0)
+
+                epoch_loss = epoch_loss/len(self.dataloaders_dict[phase].dataset)
+                print("{} Loss: {:.4f}".format(phase, epoch_loss))
+
+                if phase == "train":
+                    record_train_loss.append(epoch_loss)
+                    writer.add_scalar("Loss/Train", epoch_loss, epoch)
+                else:
+                    record_valid_loss.append(epoch_loss)
+                    writer.add_scalar("Loss/Valid", epoch_loss, epoch)
+
+            if record_train_loss and record_valid_loss:
+                writer.add_scalars("Loss/train_and_val", {"train": record_train_loss[-1], "val": record_valid_loss[-1]}, epoch)
+
+        writer.close()
+        self.saveParam()
+
+
 
 
 if __name__ == '__main__':
@@ -156,11 +275,18 @@ if __name__ == '__main__':
     valid_sequences = CFG["valid"]
 
     dim_fc_out = int(CFG["hyperparameter"]["dim_fc_out"])
-    resize = CFG["hyperparameter"]["resize"]
-    mean_element = CFG["hyperparameter"]["mean_element"]
-    std_element = CFG["hyperparameter"]["std_element"]
-    original_size = CFG["hyperparameter"]["original_size"]
-    batch_size = CFG["hyperparameter"]["batch_size"]
+    resize = int(CFG["hyperparameter"]["resize"])
+    mean_element = float(CFG["hyperparameter"]["mean_element"])
+    std_element = float(CFG["hyperparameter"]["std_element"])
+    original_size = int(CFG["hyperparameter"]["original_size"])
+    batch_size = int(CFG["hyperparameter"]["batch_size"])
+    num_epochs = int(CFG["hyperparameter"]["num_epochs"])
+    optimizer_name = str(CFG["hyperparameter"]["optimizer_name"])
+    lr_resnet = float(CFG["hyperparameter"]["lr_resnet"])
+    lr_roll_fc = float(CFG["hyperparameter"]["lr_roll_fc"])
+    lr_pitch_fc = float(CFG["hyperparameter"]["lr_pitch_fc"])
+    weight_decay = float(CFG["hyperparameter"]["weight_decay"])
+    alpha = float(CFG["hyperparameter"]["alpha"])
 
     '''
     try:
@@ -218,6 +344,13 @@ if __name__ == '__main__':
         std_element,
         original_size,
         batch_size,
+        num_epochs,
+        optimizer_name,
+        lr_resnet,
+        lr_roll_fc,
+        lr_pitch_fc,
+        weight_decay,
+        alpha,
         train_dataset,
         valid_dataset,
         net

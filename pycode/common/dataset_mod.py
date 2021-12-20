@@ -62,6 +62,8 @@ class ClassOriginalDataset(data.Dataset):
         mono_path = self.data_list[index][0]
         depth_path = self.data_list[index][1]
 
+        #print(mono_path, depth_path)
+
         roll_str = self.data_list[index][5]
         pitch_str = self.data_list[index][6]
 
