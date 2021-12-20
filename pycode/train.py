@@ -123,7 +123,7 @@ class Trainer:
 
     def getNetwork(self, net):
         print("Loading Network")
-        #print(net)
+        print(net)
         net = net.to(self.device)
         if self.multiGPU == 1 and self.device == 'cuda':
             net = nn.DataParallel(net)

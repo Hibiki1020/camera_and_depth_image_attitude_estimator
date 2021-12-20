@@ -189,7 +189,7 @@ class DualResNet(nn.Module):
                           bias=False),
                 norm_layer(stem_width, eps=bn_eps, momentum=bn_momentum),
                 nn.ReLU(inplace=inplace),
-                nn.Conv2d(stem_width, stem_width * 2, kernel_size=3, stride=1,
+                nn.Conv2d(stem_width, stem_width, kernel_size=3, stride=1,
                           padding=1,
                           bias=False),
             )
@@ -203,7 +203,7 @@ class DualResNet(nn.Module):
                           bias=False),
                 norm_layer(stem_width, eps=bn_eps, momentum=bn_momentum),
                 nn.ReLU(inplace=inplace),
-                nn.Conv2d(stem_width, stem_width * 2, kernel_size=3, stride=1,
+                nn.Conv2d(stem_width, stem_width, kernel_size=3, stride=1,
                           padding=1,
                           bias=False),
             )

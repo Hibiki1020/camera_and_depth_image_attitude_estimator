@@ -28,8 +28,12 @@ class Network(nn.Module):
     def forward(self, mono, depth):
         blocks, merges = self.feature_extractor(mono, depth)
 
-        roll = self.fully_connected.roll_fc(merges[3])
-        pitch = self.fully_connected.pitch_fc(merges[3])
+        fc_input = torch.flatten(merges[3], 1)
+
+        #print(fc_input.size())
+
+        roll = self.fully_connected.roll_fc(fc_input)
+        pitch = self.fully_connected.pitch_fc(fc_input)
 
         logged_roll = nn_functional.log_softmax(roll, dim=1)
         logged_pitch = nn_functional.log_softmax(pitch, dim=1)
