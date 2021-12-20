@@ -23,3 +23,4 @@ hyperparameter:
   mean_element: 0.5
   std_element: 0.5
   dim_fc_out: 61
+  batch_size: 16

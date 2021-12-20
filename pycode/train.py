@@ -3,6 +3,8 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import time
 import datetime
+import numpy as np
+import random
 
 import argparse
 import subprocess
@@ -17,6 +19,7 @@ import torch
 from torchvision import models
 import torch.nn as nn
 import torch.optim as optim
+import torch.backends.cudnn as cudnn
 
 from tensorboardX import SummaryWriter
 
@@ -26,6 +29,97 @@ from common import make_datalist_mod
 from common import data_transform_mod
 
 from common import network_mod
+
+class Trainer:
+    def __init__(self,
+            save_top_path, 
+            weights_path,
+            log_path,
+            graph_path,
+            csv_name,
+            index_csv_path,
+            multiGPU,
+            pretrained_model,
+            train_sequences,
+            valid_sequences,
+            dim_fc_out,
+            resize,
+            mean_element,
+            std_element,
+            original_size,
+            batch_size,
+            train_dataset,
+            valid_dataset,
+            net
+        ):
+
+        self.save_top_path = save_top_path
+        self.weights_path = weights_path
+        self.log_path = log_path
+        self.graph_path = graph_path
+        self.csv_name = csv_name
+        self.index_csv_path = index_csv_path
+        self.multiGPU = multiGPU
+        self.pretrained_model = pretrained_model
+        self.train_sequences = train_sequences
+        self.valid_sequences = valid_sequences
+        self.dim_fc_out = dim_fc_out
+        self.resize = resize
+        self.mean_element = mean_element
+        self.std_element = std_element
+        self.original_size = original_size
+        self.batch_size = batch_size
+        self.train_dataset = train_dataset
+        self.valid_dataset = valid_dataset
+        self.net = net
+        
+        if self.multiGPU == 0:
+            self.device = torch.device("cuda:0" if torch.cuda.is_available else "cpu")
+        else:
+            self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+        self.setRandomCondition()
+        self.dataloaders_dict = self.getDataloaders(train_dataset, valid_dataset, batch_size)
+        self.net = self.getNetwork(net)
+
+    def setRandomCondition(self, keep_reproducibility=False, seed=123456789):
+        if keep_reproducibility:
+            torch.manual_seed(seed)
+            np.random.seed(seed)
+            random.seed(seed)
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+
+    def getDataloaders(self, train_dataset, valid_dataset, batch_size):
+        train_dataloader = torch.utils.data.DataLoader(
+            train_dataset,
+            batch_size = 16,
+            shuffle=True
+        )
+
+        valid_dataloader = torch.utils.data.DataLoader(
+            valid_dataset,
+            batch_size = 16,
+            shuffle=True
+        )
+
+        dataloaders_dict = {"train":train_dataloader, "valid":valid_dataloader}
+
+        return dataloaders_dict
+
+    def getNetwork(self, net):
+        print(net)
+        net = net.to(self.device)
+        if self.multiGPU == 1 and self.device == 'cuda':
+            net = nn.DataParallel(net)
+            cudnn.benchmark = True
+            print("Training on multiGPU device")
+        
+        return net
+
+    def train(self):
+        print("Start Training")
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("./train.py")
@@ -66,6 +160,7 @@ if __name__ == '__main__':
     mean_element = CFG["hyperparameter"]["mean_element"]
     std_element = CFG["hyperparameter"]["std_element"]
     original_size = CFG["hyperparameter"]["original_size"]
+    batch_size = CFG["hyperparameter"]["batch_size"]
 
     '''
     try:
@@ -104,18 +199,28 @@ if __name__ == '__main__':
         dim_fc_out = dim_fc_out
     )
 
-    train_dataloader = torch.utils.data.DataLoader(
-        train_dataset,
-        batch_size = 16,
-        shuffle=True
-    )
-
-    valid_dataloader = torch.utils.data.DataLoader(
-        valid_dataset,
-        batch_size = 16,
-        shuffle=True
-    )
-
-    dataloaders_dict = {"train":train_dataloader, "valid":valid_dataloader}
-
     net = network_mod.Network(dim_fc_out, norm_layer=nn.BatchNorm2d,pretrained_model=pretrained_model)
+
+    trainer = Trainer(
+        save_top_path, 
+        weights_path,
+        log_path,
+        graph_path,
+        csv_name,
+        index_csv_path,
+        multiGPU,
+        pretrained_model,
+        train_sequences,
+        valid_sequences,
+        dim_fc_out,
+        resize,
+        mean_element,
+        std_element,
+        original_size,
+        batch_size,
+        train_dataset,
+        valid_dataset,
+        net
+    )
+
+    trainer.train()
