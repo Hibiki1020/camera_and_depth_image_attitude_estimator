@@ -1,4 +1,5 @@
-save_top_path: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/test_full_train_2021_12_22"
+#save_top_path: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/test_full_train_2021_12_22"
+save_top_path: "/home/log"
 weights_path: "/weights"
 log_path: "/log"
 graph_path: "/graph"
