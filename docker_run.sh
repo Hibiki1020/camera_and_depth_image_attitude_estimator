@@ -3,7 +3,7 @@ image_name="mono_and_depth_image_attitude_estimator"
 tag_name="cuda101"
 script_dir=$(cd $(dirname $0); pwd)
 
-docker run -it --rm\
+docker run -it \
     --net="host" \
     --gpus all \
 	--privileged \
