@@ -194,7 +194,7 @@ class InferenceMod:
         infer_count = 0
 
         for (img_path, depth_path, ground_truth) in zip(image_data_list, depth_data_list, ground_truth_list):
-            print("---------Inference at " + str(infer_count) + "---------")
+            print("---------Inference at " + str(infer_count + 1) + "---------")
             infer_count += 1
 
             mono_image = cv2.imread(img_path)

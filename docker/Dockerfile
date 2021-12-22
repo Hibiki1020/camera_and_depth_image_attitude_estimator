@@ -1,4 +1,4 @@
-FROM vistart/cuda:10.0-cudnn7-tensorrt6-devel-ubuntu18.04
+FROM vistart/cuda:10.1-cudnn7-tensorrt6-devel-ubuntu18.04
 
 ########## nvidia-docker1 hooks ##########
 LABEL com.nvidia.volumes.needed="nvidia_driver"
@@ -13,10 +13,7 @@ RUN apt-get update && apt-get install -y \
 	wget \
 	unzip \
 	git \
-	build-essential \
-	libsm6 \
-	libxrender1 \
-	libxext-dev
+	build-essential
 
 RUN apt-get update && \
 	apt-get install -y \
@@ -24,7 +21,7 @@ RUN apt-get update && \
 
 RUN python3 -m pip install -U --force-reinstall pip
 
-RUN pip install scikit-learn \
+RUN pip3 install scikit-learn \
 		tensorflow \
 		tensorboardX==1.6 \
         opencv-python==4.2.0.34 \
@@ -34,11 +31,12 @@ RUN pip install scikit-learn \
         scipy==1.5.0 \
         pbkdf2==1.3
 
-RUN pip install \
-	    torch==1.0.0 \
-        torchvision==0.2.1
+RUN pip3 install \
+	    torch==1.7.1 \
+        torchvision==0.8.2 \
+        torchaudio==0.7.2
 
-RUN pip install torchsummary==1.5.1 \
+RUN pip3 install torchsummary==1.5.1 \
 		tqdm \
 		matplotlib \
 		pyyaml
@@ -49,9 +47,6 @@ ARG CACHEBUST=1
 RUN mkdir /home/pycode && \
 	cd /home/pycode && \
     git clone https://github.com/Hibiki1020/mono_and_depth_image_attitude_estimator.git && \
-    cd /home/pycode/mono_and_depth_image_attitude_estimator && \
-	cd /home/pycode/mono_and_depth_image_attitude_estimator/weights && \
-	wget https://download.pytorch.org/models/resnet101-63fe2227.pth && \
-	cd /home/pycode/mono_and_depth_image_attitude_estimator
+    cd /home/pycode/mono_and_depth_image_attitude_estimator
 
 WORKDIR /home/pycode/mono_and_depth_image_attitude_estimator
