@@ -1,6 +1,6 @@
 #!/bin/bash
 image_name="mono_and_depth_image_attitude_estimator"
-tag_name="cuda101"
+tag_name="docker"
 script_dir=$(cd $(dirname $0); pwd)
 
 docker run -it \
