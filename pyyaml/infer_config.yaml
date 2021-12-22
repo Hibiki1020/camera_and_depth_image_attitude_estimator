@@ -1,0 +1,18 @@
+infer_dataset_top_directory: "/home/ssd_dir/rgbd_airsim_image/image5000_2021_12_20"
+csv_name: "data_list.csv"
+
+weights_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/test_2021_12_20/"
+weights_file_name: "weightsweight.pth"
+
+infer_log_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/test_2021_12_20/"
+infer_log_file_name: "frame_infer_relust_test.csv"
+
+index_dict_name: "index_dict_-30_30_range_step1deg.csv"
+
+original_size: 672
+resize: 224
+mean_element: 0.5
+std_element: 0.5
+dim_fc_out: 61
+enable_dropout: False
+dropout_rate: 0.1

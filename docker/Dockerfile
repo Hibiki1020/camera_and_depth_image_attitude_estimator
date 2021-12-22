@@ -13,7 +13,10 @@ RUN apt-get update && apt-get install -y \
 	wget \
 	unzip \
 	git \
-	build-essential
+	build-essential \
+	libsm6 \
+	libxrender1 \
+	libxext-dev
 
 RUN apt-get update && \
 	apt-get install -y \

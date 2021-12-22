@@ -163,7 +163,7 @@ class Trainer:
         return optimizer
 
     def saveParam(self):
-        save_path = self.weights_path + "weight.pth"
+        save_path = self.weights_path + ".pth"
         torch.save(self.net.state_dict(), save_path)
         print("Saved Weight")
 
@@ -256,7 +256,7 @@ class Trainer:
         
         writer.close()
         self.saveParam()
-        self.saveGraph()
+        self.saveGraph(record_train_loss, record_valid_loss)
 
 
 if __name__ == '__main__':

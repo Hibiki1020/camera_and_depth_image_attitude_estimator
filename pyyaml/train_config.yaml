@@ -1,12 +1,14 @@
-save_top_path: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/test"
+save_top_path: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/test_2021_12_20"
 weights_path: "/weights"
 log_path: "/log"
 graph_path: "/graph"
 
 train:
-  - "/home/ssd_dir/rgbd_airsim_image/image10000_2021_12_10"
+#  - "/home/ssd_dir/rgbd_airsim_image/image10000_2021_12_10"
+#  - "/home/ssd_dir/rgbd_airsim_image/image10000_2021_12_10_2"
+  - "/home/ssd_dir/rgbd_airsim_image/image70000_2021_12_20"
 valid:
-  - "/home/ssd_dir/rgbd_airsim_image/image10000_2021_12_10_2"
+  - "/home/ssd_dir/rgbd_airsim_image/image5000_2021_12_20"
 
 csv_name: "data_list.csv"
 
@@ -24,10 +26,10 @@ hyperparameter:
   std_element: 0.5
   dim_fc_out: 61
   batch_size: 128
-  num_epochs: 10
+  num_epochs: 30
   optimizer_name: "Adam"
   lr_resnet: 1e-4
   lr_roll_fc: 1e-4
   lr_pitch_fc: 1e-4
-  weight_decay: 0.01
-  alpha: 1e-4
+  weight_decay: 0.00
+  alpha: 5e-5
