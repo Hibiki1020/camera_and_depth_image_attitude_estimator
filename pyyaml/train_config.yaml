@@ -21,7 +21,7 @@ pretrained_model: "/home/pycode/mono_and_depth_image_attitude_estimator/weights/
 multiGPU: 0 #1 is ture
 
 hyperparameter:
-  original_size: 672
+  original_size: 480
   resize: 224
   mean_element: 0.5
   std_element: 0.5
