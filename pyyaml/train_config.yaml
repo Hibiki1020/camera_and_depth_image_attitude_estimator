@@ -18,7 +18,7 @@ index_csv_path: "/home/pycode/mono_and_depth_image_attitude_estimator/index_dict
 pretrained_model: "/home/pycode/mono_and_depth_image_attitude_estimator/weights/resnet101-63fe2227.pth"
 #pretrained_model: "/home/pycode/mono_and_depth_image_attitude_estimator/weights/resnet101_v1c.pth"
 
-multiGPU: 0 #1 is ture
+multiGPU: 1 #1 is ture
 
 hyperparameter:
   original_size: 480
