@@ -42,7 +42,7 @@ class InferenceMod:
         self.infer_log_file_name = CFG["infer_log_file_name"]
         
         self.index_dict_name = CFG["index_dict_name"]
-        self.index_dict_path = "../index_dict/" + self.index_dict_name
+        self.index_dict_path = "../../index_dict/" + self.index_dict_name
 
         self.original_size = int(CFG["original_size"])
         self.resize = int(CFG["resize"])
@@ -117,6 +117,16 @@ class InferenceMod:
         self.image_data_list, self.depth_data_list, self.ground_truth_list = self.get_data()
         
         self.result_csv = self.frame_infer(self.image_data_list, self.depth_data_list, self.ground_truth_list)
+        self.save_csv(self.result_csv)
+
+    def save_csv(self, result_csv):
+        result_csv_path = os.path.join(self.infer_log_top_directory, self.infer_log_file_name)
+        csv_file = open(result_csv_path, 'w')
+        csv_w = csv.writer(csv_file)
+        for row in result_csv:
+            csv_w.writerow(row)
+        csv_file.close()
+        print("Save Inference Data")
 
     def get_data(self):
         image_data_list = []

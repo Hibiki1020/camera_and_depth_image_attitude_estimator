@@ -1,2 +1,2 @@
-infer_log_top_path: "/home/ssd_dir/num_regression_attitude_estimator_log/infer_log/test_08_21_regression/"
+infer_log_top_path: "/media/amsl/96fde31e-3b9b-4160-8d8a-a4b913579ca21/mono_and_depth_image_attitude_estimator_log/test_2021_12_27/infer_log"
 infer_log_file_name: "frame_infer_relust.csv"

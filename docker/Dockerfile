@@ -41,6 +41,8 @@ RUN pip3 install torchsummary==1.5.1 \
 		matplotlib \
 		pyyaml
 
+RUN apt install libsm6 libxrender1 libxext-dev
+
 ##### NO cache #####
 ARG CACHEBUST=1
 
