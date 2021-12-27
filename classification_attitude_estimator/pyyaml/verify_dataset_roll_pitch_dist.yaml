@@ -1,0 +1,5 @@
+dataset:
+  - "/media/amsl/96fde31e-3b9b-4160-8d8a-a4b913579ca21/airsim_dataset_kawai/AirSimNH/normal_distribution_data1_image_70000/"
+  - "/media/amsl/96fde31e-3b9b-4160-8d8a-a4b913579ca21/airsim_dataset_kawai/AirSimNH/normal_distribution_data2_image_490000/"
+
+csv_name: "image_attitude.csv"

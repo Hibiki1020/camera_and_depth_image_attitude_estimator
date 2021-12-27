@@ -1,0 +1,38 @@
+method_name: "regression"
+
+save_top_path: "/home/cnn_attitude_estimator_log/range_30/train_luffy_35000"
+weights_path: "/weights"
+log_path: "/log"
+graph_path: "/graph"
+
+train:
+#  - "/home/ssd_dir/AirSimNH/AirSimNH/range_30_30/dir2_image70000/"
+  - "/home/ssd_dir/airsim_dataset_kawai/AirSimNH/range_30_30/dir1_image35000/"
+#  - "/home/ssd_dir/AirSimNH/AirSimNH/range_30_30/dir3_image210000/"
+valid:
+  - "/home/ssd_dir/airsim_dataset_kawai/AirSimNH/range_30_30/valid_image5000/"
+
+csv_name: "image_attitude.csv"
+
+index_csv_path: "/home/ros_catkin_ws/src/cnn_attitude_estimator/index_dict/index_dict_-30_30_range_step1deg.csv"
+
+multiGPU: 0 #1 is ture
+
+hyperparameter:
+  original_size: 480
+  resize: 224
+  mean_element: 0.5
+  std_element: 0.5
+  hor_fov_deg: 70
+  optimizer_name: "AdamW" #SGD or Adam or AdamW
+  loss_function: "CrossEntropyLoss" #CrossEntropyLoss or MSELoss .
+  lr_cnn: 1e-4
+  lr_roll_fc: 1e-4
+  lr_pitch_fc: 1e-4
+  weight_decay: 0.0
+  batch_size: 50
+  num_epochs: 50
+  dropout_rate: 0.1
+  dim_fc_out: 61
+  alpha: 1e-4
+  clip_limit: 0.1
