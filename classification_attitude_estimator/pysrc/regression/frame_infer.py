@@ -349,29 +349,27 @@ class CNNAttitudeEstimator:
                 roll_hist_array.append(tmp)
                 pitch_hist_array.append(tmp)
 
-            for i in range(self.dim_fc_out):
-                tmp = 0.0
-                roll_hist_array.append(tmp)
-                pitch_hist_array.append(tmp)
+            for window in windows:
+                inference_image = window
+                input_image = self.transformImage(inference_image)
 
-            input_mono = self.transformImage(image_original)
+                roll_output_array, pitch_output_array = self.prediction(input_image)
 
-            roll_output_array, pitch_output_array = self.prediction(input_mono)
-            tmp_roll = self.array_to_value_simple(roll_output_array)
-            tmp_pitch = self.array_to_value_simple(pitch_output_array)
+                tmp_roll = self.array_to_value_simple(roll_output_array)
+                tmp_pitch = self.array_to_value_simple(pitch_output_array)
 
-            roll_hist_array += roll_output_array[0]
-            pitch_hist_array += pitch_output_array[0]
+                roll_hist_array += roll_output_array[0]
+                pitch_hist_array += pitch_output_array[0]
 
-            tmp_result = [tmp_roll, tmp_pitch]
+                tmp_result = [tmp_roll, tmp_pitch]
                 
-            roll_result_list.append(tmp_roll)
-            pitch_result_list.append(tmp_pitch)
+                roll_result_list.append(tmp_roll)
+                pitch_result_list.append(tmp_pitch)
 
-            roll_value_array.append(tmp_roll)
-            pitch_value_array.append(tmp_pitch)
+                roll_value_array.append(tmp_roll)
+                pitch_value_array.append(tmp_pitch)
 
-            result.append(tmp_result)
+                result.append(tmp_result)
 
             roll_hist_array /= float(len(windows))
             pitch_hist_array /= float(len(windows))

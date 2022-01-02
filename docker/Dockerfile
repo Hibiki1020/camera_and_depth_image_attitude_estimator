@@ -55,9 +55,10 @@ RUN mkdir /home/pycode && \
 	wget https://download.pytorch.org/models/resnet101-63fe2227.pth && \
 	cd /home/pycode/mono_and_depth_image_attitude_estimator
 
-RUN apt-get update && apt-get upgrade -y && apt-get -y install gosu
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+#RUN apt-get update && apt-get upgrade -y && apt-get -y install gosu
+
+#COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+#RUN chmod +x /usr/local/bin/entrypoint.sh
+#ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 WORKDIR /home/pycode/mono_and_depth_image_attitude_estimator
