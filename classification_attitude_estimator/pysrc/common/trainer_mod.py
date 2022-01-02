@@ -165,7 +165,7 @@ class Trainer:
         start_clock = time.time()
 
         #Loss Record
-        writer = SummaryWriter(logdir=self.log_path + self.str_hyperparameter)
+        writer = SummaryWriter(log_dir=str(self.log_path + self.str_hyperparameter))
         
         record_loss_train = []
         record_loss_val = []

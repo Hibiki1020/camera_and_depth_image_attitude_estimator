@@ -107,18 +107,18 @@ class Trainer:
     def getDataloaders(self, train_dataset, valid_dataset, batch_size):
         train_dataloader = torch.utils.data.DataLoader(
             train_dataset,
-            batch_size = 16,
+            batch_size = batch_size,
             shuffle=True,
-            num_workers = 2,
-            pin_memory =True
+            #num_workers = 2,
+            #pin_memory =True
         )
 
         valid_dataloader = torch.utils.data.DataLoader(
             valid_dataset,
-            batch_size = 16,
+            batch_size = batch_size,
             shuffle=True,
-            num_workers = 2,
-            pin_memory = True
+            #num_workers = 2,
+            #pin_memory = True
         )
 
         dataloaders_dict = {"train":train_dataloader, "valid":valid_dataloader}
