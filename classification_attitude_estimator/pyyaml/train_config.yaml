@@ -1,20 +1,21 @@
 method_name: "regression"
 
-save_top_path: "/home/cnn_attitude_estimator_log/range_30/train_luffy_35000"
+save_top_path: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/SII2022/train_2022_1_2"
 weights_path: "/weights"
 log_path: "/log"
 graph_path: "/graph"
 
 train:
-#  - "/home/ssd_dir/AirSimNH/AirSimNH/range_30_30/dir2_image70000/"
-  - "/home/ssd_dir/airsim_dataset_kawai/AirSimNH/range_30_30/dir1_image35000/"
-#  - "/home/ssd_dir/AirSimNH/AirSimNH/range_30_30/dir3_image210000/"
+  - "/home/ssd_dir/rgbd_airsim_image/image10000_2021_12_10"
+  - "/home/ssd_dir/rgbd_airsim_image/image10000_2021_12_10_2"
+  - "/home/ssd_dir/rgbd_airsim_image/image70000_2021_12_20"
+  - "/home/ssd_dir/rgbd_airsim_image/image70000_2021_12_29"
 valid:
-  - "/home/ssd_dir/airsim_dataset_kawai/AirSimNH/range_30_30/valid_image5000/"
+  - "/home/ssd_dir/rgbd_airsim_image/image5000_2021_12_20"
 
-csv_name: "image_attitude.csv"
+csv_name: "data_list.csv"
 
-index_csv_path: "/home/ros_catkin_ws/src/cnn_attitude_estimator/index_dict/index_dict_-30_30_range_step1deg.csv"
+index_csv_path: "/home/pycode/mono_and_depth_image_attitude_estimator/index_dict/index_dict_-30_30_range_step1deg.csv"
 
 multiGPU: 0 #1 is ture
 
@@ -30,8 +31,8 @@ hyperparameter:
   lr_roll_fc: 1e-4
   lr_pitch_fc: 1e-4
   weight_decay: 0.0
-  batch_size: 50
-  num_epochs: 50
+  batch_size: 512
+  num_epochs: 60
   dropout_rate: 0.1
   dim_fc_out: 61
   alpha: 1e-4

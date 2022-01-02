@@ -76,8 +76,16 @@ class InferenceMod:
         std = std_element
         size = (resize, resize)
 
+        '''
         img_transform = transforms.Compose([
             transforms.CenterCrop(original_size),
+            transforms.Resize(size),
+            transforms.ToTensor(),
+            transforms.Normalize((mean,), (std,))
+        ])
+        '''
+
+        img_transform = transforms.Compose([
             transforms.Resize(size),
             transforms.ToTensor(),
             transforms.Normalize((mean,), (std,))
