@@ -7,6 +7,7 @@ docker run -it \
     --net="host" \
     --gpus all \
 	--privileged \
+    --shm-size=16g \
 	--env="DISPLAY" \
 	--env="QT_X11_NO_MITSHM=1" \
     --name="mono_and_depth_image_attitude_estimator" \
