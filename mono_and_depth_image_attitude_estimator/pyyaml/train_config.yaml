@@ -6,7 +6,7 @@ graph_path: "/graph"
 train:
   - "/home/ssd_dir/rgbd_airsim_image/color_depth_images/image50000"
 valid:
-   - "/home/ssd_dir/rgbd_airsim_image/color_depth_images/image25000"
+   - "/home/ssd_dir/rgbd_airsim_image/color_depth_images/test100"
 
 csv_name: "data_list.csv"
 
