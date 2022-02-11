@@ -43,6 +43,8 @@ RUN pip3 install torchsummary==1.5.1 \
 
 RUN apt install -y libsm6 libxrender1 libxext-dev
 
+RUN apt-get install python3-tk
+
 ##### NO cache #####
 ARG CACHEBUST=1
 

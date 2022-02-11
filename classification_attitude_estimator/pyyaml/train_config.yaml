@@ -1,6 +1,6 @@
 method_name: "regression"
 
-save_top_path: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log//ssd_dir/mono_and_depth_image_attitude_estimator_log/train_2022_02_08"
+save_top_path: "/home/log/classification_train_2022_02_11"
 weights_path: "/weights"
 log_path: "/log"
 graph_path: "/graph"
@@ -8,7 +8,7 @@ graph_path: "/graph"
 train:
   - "/home/ssd_dir/rgbd_airsim_image/color_depth_images/image50000"
 valid:
-   - "/home/ssd_dir/rgbd_airsim_image/color_depth_images/image25000"
+   - "/home/ssd_dir/rgbd_airsim_image/color_depth_images/test100"
 
 csv_name: "data_list.csv"
 

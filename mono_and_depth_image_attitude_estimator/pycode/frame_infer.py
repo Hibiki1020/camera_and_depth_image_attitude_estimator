@@ -231,6 +231,14 @@ class InferenceMod:
 
         return mono_windows, depth_windows
 
+    def show_fig(self, roll_hist_array, pitch_hist_array, value_dict, image):
+        plt.bar(value_dict, roll_hist_array)
+        plt.show()
+
+        #cv2.imshow('image',image)
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
+
     def show_fig_no(self, roll_hist_array, pitch_hist_array, value_dict, image):
 
         np_roll_hist_array = np.array(roll_hist_array).reshape([1, self.dim_fc_out])
@@ -336,7 +344,7 @@ class InferenceMod:
             print("Diff Pitch: " + str(diff_pitch) + " [deg]")
 
             
-            #self.show_fig(roll_hist_array, pitch_hist_array, self.value_dict, windows[1])
+            #self.show_fig_no(roll_hist_array, pitch_hist_array, self.value_dict, mono_windows[1])
             
 
 
