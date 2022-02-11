@@ -27,7 +27,7 @@ from collections import OrderedDict
 
 import sys
 sys.path.append('../')
-from common import network_mod
+#from common import network_mod
 from common import vgg_network_mod
 
 class CNNAttitudeEstimator:
@@ -47,7 +47,7 @@ class CNNAttitudeEstimator:
         self.infer_log_file_name = CFG["infer_log_file_name"]
 
         self.index_dict_name = CFG["index_dict_name"]
-        self.index_dict_path = "../../index_dict/" + self.index_dict_name
+        self.index_dict_path = "../../../index_dict/" + self.index_dict_name
 
         self.window_original_size = int(CFG["window_original_size"])
         self.original_size = int(CFG["original_size"])
@@ -86,7 +86,7 @@ class CNNAttitudeEstimator:
             if module.__class__.__name__.startswith('Dropout'):
                 module.train()
 
-    def getImageTransform(self, original_size, resize,mean_element,std_element):
+    def getImageTransform(self, resize,mean_element,std_element):
 
         mean = mean_element
         std = std_element
@@ -102,7 +102,6 @@ class CNNAttitudeEstimator:
 
         '''
         img_transform = transforms.Compose([
-            transforms.CenterCrop(original_size),
             transforms.Resize(size),
             transforms.ToTensor(),
             transforms.Normalize((mean,), (std,))
@@ -145,18 +144,22 @@ class CNNAttitudeEstimator:
     def get_data(self):
         image_data_list = []
         data_list = []
-        
+
         csv_path = os.path.join(self.infer_dataset_top_directory, self.csv_name)
 
         with open(csv_path) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                img_path = os.path.join(self.infer_dataset_top_directory, row[0])
-                gt_roll = float(row[4])/3.141592*180.0
-                gt_pitch = float(row[5])/3.141592*180.0
+                #img_path = os.path.join(self.infer_dataset_top_directory, row[0])
+                img_path = self.infer_dataset_top_directory + "/camera_image/" + row[0]
+                
+                gt_roll = float(row[5])/3.141592*180.0
+                gt_pitch = float(row[6])/3.141592*180.0
+
+                #print(img_path)
 
                 image_data_list.append(img_path)
-                tmp_row = [row[0], gt_roll, gt_pitch]
+                tmp_row = [row[0], row[1], gt_roll, gt_pitch]
                 data_list.append(tmp_row)
 
         return image_data_list, data_list
@@ -319,6 +322,9 @@ class CNNAttitudeEstimator:
 
         infer_count = 0
 
+        diff_total_roll = 0.0
+        diff_total_pitch = 0.0
+
         for (img_path, ground_truth) in zip(image_data_list, ground_truth_list):
             print("---------Inference at " + str(infer_count) + "---------")
             infer_count += 1
@@ -393,15 +399,21 @@ class CNNAttitudeEstimator:
             roll_var = np.var(np_roll_value_array)
             pitch_var = np.var(np_pitch_value_array)
 
+            diff_roll = np.abs(roll - ground_truth[2])
+            diff_pitch = np.abs(pitch - ground_truth[3])
+
+            diff_total_roll += diff_roll
+            diff_total_pitch += diff_pitch
+
             print("Infered Roll:  " + str(roll) +  "[deg]")
-            print("GT Roll:       " + str(ground_truth[1]) + "[deg]")
+            print("GT Roll:       " + str(ground_truth[2]) + "[deg]")
             print("Infered Pitch: " + str(pitch) + "[deg]")
-            print("GT Pitch:      " + str(ground_truth[2]) + "[deg]")
-            print("Roll Variance :" + str(roll_var))
-            print("Pitch Variance:" + str(pitch_var))
+            print("GT Pitch:      " + str(ground_truth[3]) + "[deg]")
+            print("Diff Roll: " + str(diff_roll) + " [deg]")
+            print("Diff Pitch: " + str(diff_pitch) + " [deg]")
 
             
-            #self.show_fig(roll_hist_array, pitch_hist_array, self.value_dict, windows[1])
+            #self.show_fig_no(roll_hist_array, pitch_hist_array, self.value_dict, mono_windows[1])
             
 
 
@@ -409,12 +421,16 @@ class CNNAttitudeEstimator:
             
 
             #Image roll pitch GTroll GTpitch
-            tmp_result_csv = [ground_truth[0], roll, pitch, ground_truth[1], ground_truth[2], roll_var, pitch_var]
+            tmp_result_csv = [ground_truth[0], ground_truth[1], roll, pitch, ground_truth[2], ground_truth[3], diff_roll, diff_pitch]
             result_csv.append(tmp_result_csv)
 
             print("Period [s]: ", time.time() - start_clock)
             print("---------------------")
 
+
+        print("Inference Test Has Done....")
+        print("Average of Error of Roll : " + str(diff_total_roll/float(infer_count)) + " [deg]")
+        print("Average of Error of Pitch: " + str(diff_total_pitch/float(infer_count)) + " [deg]")
         return result_csv
 
 if __name__ == '__main__':
