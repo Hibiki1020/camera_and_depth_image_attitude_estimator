@@ -52,6 +52,9 @@ class InferenceMod:
         self.enable_dropout = bool(CFG["enable_dropout"])
         self.dropout_rate = float(CFG["dropout_rate"])
 
+        self.window_original_size = int(CFG["window_original_size"])
+        self.num_windows = int(CFG["num_windows"])
+
         self.image_cv = np.empty(0)
         self.depth_cv = np.empty(0)
 
@@ -205,11 +208,49 @@ class InferenceMod:
         img_pil = PILIMAGE.fromarray(img_cv)
         return img_pil
 
+    def extract_window(self, mono_image, depth_image):
+        height = mono_image.shape[0]
+        width = mono_image.shape[1]
+
+        mono_windows = []
+        depth_windows = []
+
+        window_count = 0
+
+        while window_count < self.num_windows:
+            width_start = random.randint(0, int(width)-self.window_original_size)
+            height_start = random.randint(0, int(height)-self.window_original_size)
+
+            mono_window = mono_image[height_start:(height_start + self.window_original_size), width_start:(width_start + self.window_original_size)]
+            depth_window = depth_image[height_start:(height_start + self.window_original_size), width_start:(width_start + self.window_original_size)]
+
+            mono_windows.append(mono_window)
+            depth_windows.append(depth_window)
+
+            window_count += 1
+
+        return mono_windows, depth_windows
+
+    def show_fig_no(self, roll_hist_array, pitch_hist_array, value_dict, image):
+
+        np_roll_hist_array = np.array(roll_hist_array).reshape([1, self.dim_fc_out])
+        np_pitch_hist_array = np.array(pitch_hist_array).reshape([1, self.dim_fc_out])
+
+        two_hist_array = np.matmul(np_roll_hist_array.T, np_pitch_hist_array)
+
+        fig = plt.figure(figsize=(8,6))
+        plt.imshow(two_hist_array)
+        plt.title("Plot 2D array")
+        plt.show()
+
+
     def frame_infer(self, image_data_list, depth_data_list, ground_truth_list):
         print("Start Inference")
 
         result_csv = []
         infer_count = 0
+        diff_total_roll = 0.0
+        diff_total_pitch = 0.0
 
         for (img_path, depth_path, ground_truth) in zip(image_data_list, depth_data_list, ground_truth_list):
             print("---------Inference at " + str(infer_count + 1) + "---------")
@@ -219,6 +260,8 @@ class InferenceMod:
             #cv2.imshow('image', mono_image)
             #cv2.waitKey(0)
             depth_image = cv2.imread(depth_path)
+
+            mono_windows, depth_windows = self.extract_window(mono_image, depth_image)
 
             start_clock = time.time()
 
@@ -238,28 +281,29 @@ class InferenceMod:
                 roll_hist_array.append(tmp)
                 pitch_hist_array.append(tmp)
 
-            input_mono = self.transformImage(mono_image)
-            input_depth = self.transformImage(depth_image)
+            for (mono_image, depth_image) in zip(mono_windows, depth_windows):
+                input_mono = self.transformImage(mono_image)
+                input_depth = self.transformImage(depth_image)
 
-            roll_output_array, pitch_output_array = self.prediction(input_mono, input_depth)
-            tmp_roll = self.array_to_value_simple(roll_output_array)
-            tmp_pitch = self.array_to_value_simple(pitch_output_array)
+                roll_output_array, pitch_output_array = self.prediction(input_mono, input_depth)
+                tmp_roll = self.array_to_value_simple(roll_output_array)
+                tmp_pitch = self.array_to_value_simple(pitch_output_array)
 
-            roll_hist_array += roll_output_array[0]
-            pitch_hist_array += pitch_output_array[0]
+                roll_hist_array += roll_output_array[0]
+                pitch_hist_array += pitch_output_array[0]
 
-            tmp_result = [tmp_roll, tmp_pitch]
+                tmp_result = [tmp_roll, tmp_pitch]
                 
-            roll_result_list.append(tmp_roll)
-            pitch_result_list.append(tmp_pitch)
+                roll_result_list.append(tmp_roll)
+                pitch_result_list.append(tmp_pitch)
 
-            roll_value_array.append(tmp_roll)
-            pitch_value_array.append(tmp_pitch)
+                roll_value_array.append(tmp_roll)
+                pitch_value_array.append(tmp_pitch)
 
-            result.append(tmp_result)
+                result.append(tmp_result)
 
-            #roll_hist_array /= float(len(windows))
-            #pitch_hist_array /= float(len(windows))
+            roll_hist_array /= float(len(mono_windows))
+            pitch_hist_array /= float(len(mono_windows))
 
             roll_hist = self.array_to_value_simple_hist(roll_hist_array)
             pitch_hist = self.array_to_value_simple_hist(pitch_hist_array)
@@ -278,12 +322,18 @@ class InferenceMod:
             roll_var = np.var(np_roll_value_array)
             pitch_var = np.var(np_pitch_value_array)
 
+            diff_roll = np.abs(roll - ground_truth[2])
+            diff_pitch = np.abs(pitch - ground_truth[3])
+
+            diff_total_roll += diff_roll
+            diff_total_pitch += diff_pitch
+
             print("Infered Roll:  " + str(roll) +  "[deg]")
             print("GT Roll:       " + str(ground_truth[2]) + "[deg]")
             print("Infered Pitch: " + str(pitch) + "[deg]")
             print("GT Pitch:      " + str(ground_truth[3]) + "[deg]")
-            print("Roll Variance :" + str(roll_var))
-            print("Pitch Variance:" + str(pitch_var))
+            print("Diff Roll: " + str(diff_roll) + " [deg]")
+            print("Diff Pitch: " + str(diff_pitch) + " [deg]")
 
             
             #self.show_fig(roll_hist_array, pitch_hist_array, self.value_dict, windows[1])
@@ -294,12 +344,16 @@ class InferenceMod:
             
 
             #Image roll pitch GTroll GTpitch
-            tmp_result_csv = [ground_truth[0], ground_truth[1], roll, pitch, ground_truth[2], ground_truth[3], roll_var, pitch_var]
+            tmp_result_csv = [ground_truth[0], ground_truth[1], roll, pitch, ground_truth[2], ground_truth[3], diff_roll, diff_pitch]
             result_csv.append(tmp_result_csv)
 
             print("Period [s]: ", time.time() - start_clock)
             print("---------------------")
 
+
+        print("Inference Test Has Done....")
+        print("Average of Error of Roll : " + str(diff_total_roll/float(infer_count)) + " [deg]")
+        print("Average of Error of Pitch: " + str(diff_total_pitch/float(infer_count)) + " [deg]")
         return result_csv
 
 
