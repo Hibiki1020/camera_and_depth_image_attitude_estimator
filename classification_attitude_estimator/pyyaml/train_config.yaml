@@ -1,6 +1,6 @@
 method_name: "regression"
 
-save_top_path: "/home/log/classification_train_2022_02_11_2"
+save_top_path: "/home/log/classification_train_2022_02_11__3"
 weights_path: "/weights"
 log_path: "/log"
 graph_path: "/graph"
