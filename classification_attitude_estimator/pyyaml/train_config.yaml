@@ -1,6 +1,6 @@
 method_name: "regression"
 
-save_top_path: "/home/log/classification_train_2022_02_11"
+save_top_path: "/home/log/classification_train_2022_02_11_2"
 weights_path: "/weights"
 log_path: "/log"
 graph_path: "/graph"
@@ -32,5 +32,5 @@ hyperparameter:
   num_epochs: 50
   dropout_rate: 0.1
   dim_fc_out: 61
-  alpha: 1e-5
+  alpha: 1e-6
   clip_limit: 0.1
