@@ -32,5 +32,5 @@ hyperparameter:
   num_epochs: 50
   dropout_rate: 0.1
   dim_fc_out: 61
-  alpha: 1e-6
+  alpha: 3e-6
   clip_limit: 0.1
