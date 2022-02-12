@@ -14,7 +14,7 @@ csv_name: "data_list.csv"
 
 index_csv_path: "/home/pycode/mono_and_depth_image_attitude_estimator/index_dict/index_dict_-30_30_range_step1deg.csv"
 
-multiGPU: 1 #1 is ture
+multiGPU: 0 #1 is ture
 
 hyperparameter:
   original_size: 480
