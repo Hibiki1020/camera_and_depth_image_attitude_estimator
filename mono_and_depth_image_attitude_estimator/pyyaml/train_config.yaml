@@ -23,7 +23,7 @@ hyperparameter:
   mean_element: 0.5
   std_element: 0.5
   dim_fc_out: 61
-  batch_size: 384
+  batch_size: 256
   num_epochs: 50
   optimizer_name: "Adam"
   lr_resnet: 1e-4
