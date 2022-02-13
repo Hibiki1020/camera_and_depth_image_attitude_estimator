@@ -1,6 +1,6 @@
 method_name: "regression"
 
-save_top_path: "/home/log/classification_train_2022_02_11_3"
+save_top_path: "/home/log/classification_train_2022_02_13"
 weights_path: "/weights"
 log_path: "/log"
 graph_path: "/graph"
@@ -14,7 +14,7 @@ csv_name: "data_list.csv"
 
 index_csv_path: "/home/pycode/mono_and_depth_image_attitude_estimator/index_dict/index_dict_-30_30_range_step1deg.csv"
 
-multiGPU: 0 #1 is ture
+multiGPU: 1 #1 is ture
 
 hyperparameter:
   original_size: 480
@@ -28,9 +28,9 @@ hyperparameter:
   lr_roll_fc: 1e-4
   lr_pitch_fc: 1e-4
   weight_decay: 0.0
-  batch_size: 16
+  batch_size: 512
   num_epochs: 50
   dropout_rate: 0.1
   dim_fc_out: 61
-  alpha: 3e-6
+  alpha: 1e-4
   clip_limit: 0.1
