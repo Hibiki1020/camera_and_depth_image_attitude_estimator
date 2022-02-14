@@ -13,5 +13,5 @@ docker run -it \
     --name="mono_and_depth_image_attitude_estimator" \
     --volume="$script_dir/:/home/pycode/$image_name/" \
     --volume="/home/kawai/ssd_dir/:/home/ssd_dir/" \
-    --volume="/share/kawai/:/home/strage/"
+    --volume="/share/kawai/:/home/strage/" \
     $image_name:$tag_name
