@@ -6,11 +6,11 @@ log_path: "/log"
 graph_path: "/graph"
 
 train:
-  - "/home/ssd_dir/rgbd_airsim_image/color_depth_images/image50000"
-  - "/home/ssd_dir/rgbd_airsim_image/color_depth_images/image50000_2"
-  - "/home/ssd_dir/rgbd_airsim_image/color_depth_images/image50000_3"
+  - "/home/strage/rgbd_airsim_image/color_depth_images/image50000"
+  - "/home/strage/rgbd_airsim_image/color_depth_images/image50000_2"
+  - "/home/strage/rgbd_airsim_image/color_depth_images/image50000_3"
 valid:
-   - "/home/ssd_dir/rgbd_airsim_image/color_depth_images/image25000"
+   - "/home/strage/rgbd_airsim_image/color_depth_images/image25000"
 
 csv_name: "data_list.csv"
 
