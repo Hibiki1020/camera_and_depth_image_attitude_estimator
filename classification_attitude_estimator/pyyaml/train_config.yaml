@@ -1,6 +1,6 @@
 method_name: "regression"
 
-save_top_path: "/home/log/classification_train_2022_02_13"
+save_top_path: "/home/log/classification_train_2022_02_14"
 weights_path: "/weights"
 log_path: "/log"
 graph_path: "/graph"
@@ -28,7 +28,7 @@ hyperparameter:
   lr_roll_fc: 1e-4
   lr_pitch_fc: 1e-4
   weight_decay: 0.0
-  batch_size: 512
+  batch_size: 256
   num_epochs: 50
   dropout_rate: 0.1
   dim_fc_out: 61

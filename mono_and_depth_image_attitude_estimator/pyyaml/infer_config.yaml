@@ -1,11 +1,11 @@
 infer_dataset_top_directory: "/home/ssd_dir/rgbd_airsim_image/color_depth_images/inference_image/AirSimNH/image1000"
 csv_name: "data_list.csv"
 
-weights_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/train_2022_02_08/train_2022_02_08"
+weights_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/train_2022_02_14"
 weights_file_name: "weights.pth"
 
 infer_log_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/train_2022_02_08/infer_log"
-infer_log_file_name: "frame_infer_relust_test2.csv"
+infer_log_file_name: "frame_infer_relust_test.csv"
 
 index_dict_name: "index_dict_-30_30_range_step1deg.csv"
 
