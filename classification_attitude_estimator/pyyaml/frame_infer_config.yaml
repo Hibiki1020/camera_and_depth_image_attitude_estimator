@@ -8,13 +8,13 @@ weights_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_lo
 weights_file_name: "weights.pth"
 
 infer_log_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/SII2022/dgx_test1/infer_log"
-infer_log_file_name: "frame_infer_relust.csv"
+infer_log_file_name: "frame_infer_relust3.csv"
 
 index_dict_name: "index_dict_-30_30_range_step1deg.csv"
 
 window_original_size: 480
 original_size: 480
-window_num: 10
+window_num: 15
 resize: 224
 mean_element: 0.5
 std_element: 0.5

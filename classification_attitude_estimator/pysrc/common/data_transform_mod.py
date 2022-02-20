@@ -23,7 +23,6 @@ class DataTransform():
         ])
         '''
         self.img_transform = transforms.Compose([
-            transforms.CenterCrop(original_size),
             transforms.Resize(size),
             transforms.ToTensor(),
             transforms.Normalize((mean,), (std,))

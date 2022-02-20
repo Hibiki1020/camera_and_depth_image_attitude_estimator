@@ -396,6 +396,9 @@ class CNNAttitudeEstimator:
             np_roll_value_array = np.array(roll_value_array)
             np_pitch_value_array = np.array(pitch_value_array)
 
+            #roll = np.mean(np_roll_value_array)
+            #pitch = np.mean(np_pitch_value_array)
+
             roll_var = np.var(np_roll_value_array)
             pitch_var = np.var(np_pitch_value_array)
 

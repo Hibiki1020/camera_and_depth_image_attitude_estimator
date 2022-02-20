@@ -15,8 +15,15 @@ class DataTransform():
         self.std = std
         size = (resize, resize)
 
+        '''
         self.img_transform = transforms.Compose([
             transforms.CenterCrop(original_size),
+            transforms.Resize(size),
+            transforms.ToTensor(),
+            transforms.Normalize((mean,), (std,))
+        ])
+        '''
+        self.img_transform = transforms.Compose([
             transforms.Resize(size),
             transforms.ToTensor(),
             transforms.Normalize((mean,), (std,))
