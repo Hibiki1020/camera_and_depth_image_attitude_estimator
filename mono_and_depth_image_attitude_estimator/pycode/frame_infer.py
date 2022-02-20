@@ -79,22 +79,19 @@ class InferenceMod:
         std = std_element
         size = (resize, resize)
 
-        
+        '''
         img_transform = transforms.Compose([
             transforms.CenterCrop(original_size),
             transforms.Resize(size),
             transforms.ToTensor(),
             transforms.Normalize((mean,), (std,))
         ])
-        
-
         '''
         img_transform = transforms.Compose([
             transforms.Resize(size),
             transforms.ToTensor(),
             transforms.Normalize((mean,), (std,))
         ])
-        '''
 
         return img_transform
 
@@ -182,6 +179,18 @@ class InferenceMod:
 
         value = 0.0
 
+        '''
+        if max_index == 0:
+            value = output_array[0][max_index]*self.value_dict[max_index] + output_array[0][max_index+1]*self.value_dict[max_index+1]
+        elif max_index == 360: #361
+            value = output_array[0][max_index]*self.value_dict[max_index] + output_array[0][max_index-1]*self.value_dict[max_index-1]
+        else:
+            if output_array[0][minus_index] > output_array[0][plus_index]: #一つ前のインデックスを採用
+                value = output_array[0][max_index]*self.value_dict[max_index] + output_array[0][minus_index]*self.value_dict[minus_index]
+            elif output_array[0][minus_index] < output_array[0][plus_index]: #一つ後のインデックスを採用
+                value = output_array[0][max_index]*self.value_dict[max_index] + output_array[0][plus_index]*self.value_dict[plus_index]
+        '''
+        
         for value, label in zip(output_array[0], self.value_dict):
             value += value * label
 
@@ -226,6 +235,9 @@ class InferenceMod:
             mono_window = mono_image[height_start:(height_start + self.window_original_size), width_start:(width_start + self.window_original_size)]
             depth_window = depth_image[height_start:(height_start + self.window_original_size), width_start:(width_start + self.window_original_size)]
 
+            #cv2.imshow('window',mono_window)
+            #cv2.waitKey(0)
+
             mono_windows.append(mono_window)
             depth_windows.append(depth_window)
 
@@ -237,9 +249,9 @@ class InferenceMod:
         plt.bar(value_dict, roll_hist_array)
         plt.show()
 
-        #cv2.imshow('image',image)
-        #cv2.waitKey(0)
-        #cv2.destroyAllWindows()
+        cv2.imshow('image',image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     def show_fig_no(self, roll_hist_array, pitch_hist_array, value_dict, image):
 
@@ -252,7 +264,7 @@ class InferenceMod:
         plt.imshow(two_hist_array)
         plt.title("Plot 2D array")
         plt.show()
-
+        
 
     def frame_infer(self, image_data_list, depth_data_list, ground_truth_list):
         print("Start Inference")
