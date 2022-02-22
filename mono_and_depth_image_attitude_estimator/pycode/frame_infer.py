@@ -65,6 +65,10 @@ class InferenceMod:
 
         self.net = self.getNetwork(self.resize, self.weights_path, self.dim_fc_out)
 
+        if self.enable_dropout == True:
+            print("Enable Dropout")
+            self.do_mc_dropout = self.enable_mc_dropout()
+
         self.value_dict = []
 
         with open(self.index_dict_path) as fd:
@@ -121,6 +125,14 @@ class InferenceMod:
 
         net.load_state_dict(new_state_dict)
         return net
+
+    def enable_mc_dropout(self):
+        for module in self.net.modules():
+            if module.__class__.__name__.startswith('Dropout'):
+                module.train()
+                can_dropout = True
+
+        return True
 
     def spin(self):
         print("Load data")

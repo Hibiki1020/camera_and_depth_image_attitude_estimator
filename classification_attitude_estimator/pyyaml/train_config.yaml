@@ -1,6 +1,6 @@
 method_name: "regression"
 
-save_top_path: "/home/log/classification_train_2022_02_17"
+save_top_path: "/home/log/classification_train_2022_02_22"
 weights_path: "/weights"
 log_path: "/log"
 graph_path: "/graph"
@@ -19,7 +19,7 @@ index_csv_path: "/home/pycode/mono_and_depth_image_attitude_estimator/index_dict
 multiGPU: 1 #1 is ture
 
 hyperparameter:
-  original_size: 480
+  original_size: 672
   resize: 224
   mean_element: 0.5
   std_element: 0.5
