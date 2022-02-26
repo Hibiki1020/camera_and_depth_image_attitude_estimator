@@ -285,7 +285,7 @@ if __name__ == '__main__':
         quit()
 
     save_top_path = CFG["save_top_path"]
-    yaml_path = save_top_path + "/train.yaml"
+    yaml_path = save_top_path + "/train_config.yaml"
     weights_path = CFG["save_top_path"] + CFG["weights_path"]
     log_path = CFG["save_top_path"] + CFG["log_path"]
     graph_path = CFG["save_top_path"] + CFG["graph_path"]
