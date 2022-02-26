@@ -51,6 +51,7 @@ if __name__ == '__main__':
 
     method_name = CFG["method_name"]
     save_top_path = CFG["save_top_path"]
+    yaml_path = save_top_path + "/train_config.yaml"
     weights_path = CFG["save_top_path"] + CFG["weights_path"]
     log_path = CFG["save_top_path"] + CFG["log_path"]
     graph_path = CFG["save_top_path"] + CFG["graph_path"]
@@ -79,6 +80,8 @@ if __name__ == '__main__':
     dim_fc_out = int(CFG["hyperparameter"]["dim_fc_out"])
     alpha = float(CFG["hyperparameter"]["alpha"])
     clip_limit = float(CFG["hyperparameter"]["clip_limit"])
+
+    shutil.copy('../../pyyaml/train_config.yaml', yaml_path)
 
     try:
         print("Copy files to %s for further reference." % log_path)
