@@ -30,6 +30,8 @@ from common import data_transform_mod
 
 from common import network_mod
 
+import shutil
+
 class Trainer:
     def __init__(self,
             save_top_path, 
@@ -95,6 +97,8 @@ class Trainer:
         self.dataloaders_dict = self.getDataloaders(train_dataset, valid_dataset, batch_size)
         self.net = self.getNetwork(net)
         self.optimizer = self.getOptimizer(optimizer_name, lr_resnet, lr_roll_fc, lr_pitch_fc, weight_decay)
+
+
 
     def setRandomCondition(self, keep_reproducibility=False, seed=123456789):
         if keep_reproducibility:
@@ -281,6 +285,7 @@ if __name__ == '__main__':
         quit()
 
     save_top_path = CFG["save_top_path"]
+    yaml_path = save_top_path + "/train.yaml"
     weights_path = CFG["save_top_path"] + CFG["weights_path"]
     log_path = CFG["save_top_path"] + CFG["log_path"]
     graph_path = CFG["save_top_path"] + CFG["graph_path"]
@@ -306,6 +311,8 @@ if __name__ == '__main__':
     lr_pitch_fc = float(CFG["hyperparameter"]["lr_pitch_fc"])
     weight_decay = float(CFG["hyperparameter"]["weight_decay"])
     alpha = float(CFG["hyperparameter"]["alpha"])
+
+    shutil.copy('../pyyaml/train_config.yaml', yaml_path)
 
     '''
     try:
