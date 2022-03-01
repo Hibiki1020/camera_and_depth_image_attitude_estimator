@@ -1,0 +1,18 @@
+method_name: "frame_infer"
+
+infer_dataset_top_directory: "/home/ssd_dir/airsim_dataset_kawai/Building99/infer_image_range_30_30/dir1_infer_image1000/"
+csv_name: "image_attitude.csv"
+
+weights_top_directory: "/home/ssd_dir/num_regression_attitude_estimator_log/mle/train_test_08_26/"
+weights_file_name: "weights.pth"
+
+infer_log_top_directory: "/home/ssd_dir/num_regression_attitude_estimator_log/infer_log/test_09_14_mle_building/"
+infer_log_file_name: "frame_infer_relust.csv"
+
+resize: 224
+mean_element: 0.5
+std_element: 0.5
+dim_fc_out: 9
+dropout_rate: 0.1
+num_sampling: 15
+original_size: 672
