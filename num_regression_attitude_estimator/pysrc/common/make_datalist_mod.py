@@ -8,6 +8,6 @@ def makeMultiDataList(list_rootpaths, csv_name): #For Multi Directory
         with open(csv_path) as csv_file:
             reader = csv.reader(csv_file)
             for row in reader:
-                row[0] = os.path.join(list_rootpath, row[0])
+                row[0] = list_rootpath + "/camera_image/" + row[0]
                 data_list.append(row)
     return data_list
