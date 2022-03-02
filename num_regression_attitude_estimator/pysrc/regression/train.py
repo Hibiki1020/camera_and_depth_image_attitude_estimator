@@ -81,13 +81,6 @@ if __name__ == '__main__':
 
     shutil.copy('../../pyyaml/train_config.yaml', yaml_path)
 
-    try:
-        print("Copy files to %s for further reference." % log_path)
-        copyfile(FLAGS.train_cfg, log_path + "/train_config.yaml")
-    except Exception as e:
-        print(e)
-        print("Error copying files, check permissions. Exiting....")
-        quit()
 
     train_dataset = dataset_mod.Originaldataset(
         data_list = make_datalist_mod.makeMultiDataList(train_sequences, csv_name),
