@@ -14,7 +14,7 @@ valid:
 
 csv_name: "data_list.csv"
 
-multiGPU: 1 #1 is ture
+multiGPU: 1 #1 is multiGPU
 
 hyperparameter:
   original_size: 672
