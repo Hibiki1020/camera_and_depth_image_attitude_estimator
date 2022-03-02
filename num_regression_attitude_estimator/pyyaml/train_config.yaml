@@ -1,6 +1,6 @@
 method_name: "regression"
 
-save_top_path: "/home/ssd_dir/num_regression_attitude_estimator_log/train_on_luffy_35000"
+save_top_path: "/home/log/regression_train_2022_03_02"
 weights_path: "/weights"
 log_path: "/log"
 graph_path: "/graph"
