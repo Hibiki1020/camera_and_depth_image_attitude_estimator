@@ -79,7 +79,7 @@ if __name__ == '__main__':
     dropout_rate = float(CFG["hyperparameter"]["dropout_rate"])
     dim_fc_out = int(CFG["hyperparameter"]["dim_fc_out"])
 
-    shutil.copy('../pyyaml/train_config.yaml', yaml_path)
+    shutil.copy('../../pyyaml/train_config.yaml', yaml_path)
 
     try:
         print("Copy files to %s for further reference." % log_path)
