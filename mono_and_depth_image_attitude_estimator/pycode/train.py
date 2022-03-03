@@ -41,6 +41,7 @@ class Trainer:
             csv_name,
             index_csv_path,
             multiGPU,
+            model,
             pretrained_model,
             train_sequences,
             valid_sequences,
@@ -69,6 +70,7 @@ class Trainer:
         self.csv_name = csv_name
         self.index_csv_path = index_csv_path
         self.multiGPU = multiGPU
+        self.model = model
         self.pretrained_model = pretrained_model
         self.train_sequences = train_sequences
         self.valid_sequences = valid_sequences
@@ -293,6 +295,7 @@ if __name__ == '__main__':
     index_csv_path = CFG["index_csv_path"]
     multiGPU = int(CFG["multiGPU"])
 
+    model = CFG["model"]
     pretrained_model = CFG["pretrained_model"]
 
     train_sequences = CFG["train"]
@@ -351,7 +354,9 @@ if __name__ == '__main__':
         dim_fc_out = dim_fc_out
     )
 
-    net = network_mod.Network(dim_fc_out, norm_layer=nn.BatchNorm2d,pretrained_model=pretrained_model)
+    print("Load ", model)
+    net = network_mod.Network(model, dim_fc_out, norm_layer=nn.BatchNorm2d,pretrained_model=pretrained_model)
+    print(net)
 
     trainer = Trainer(
         save_top_path, 
@@ -361,6 +366,7 @@ if __name__ == '__main__':
         csv_name,
         index_csv_path,
         multiGPU,
+        model,
         pretrained_model,
         train_sequences,
         valid_sequences,

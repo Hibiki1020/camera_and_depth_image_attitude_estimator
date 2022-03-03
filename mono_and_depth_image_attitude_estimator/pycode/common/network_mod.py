@@ -1,7 +1,8 @@
 import sys
 sys.dont_write_bytecode = True
 
-from common import feature_extractor
+from common import feature_extractor_high
+from common import feature_extractor_low
 from common import net_util
 from common import classification_fc_layer
 from common import num_regression_fc_layer
@@ -12,19 +13,39 @@ import torch.nn as nn
 import torch.nn.functional as nn_functional
 
 class Network(nn.Module):
-    def __init__(self, dim_fc_out, norm_layer, pretrained_model):
+    def __init__(self, model, dim_fc_out, norm_layer, pretrained_model):
         super(Network, self).__init__()
         self.dim_fc_out = dim_fc_out
-        #ResNet101
-        print("Load ResNet")
-        self.feature_extractor = feature_extractor.resnet101(pretrained_model, norm_layer=norm_layer, bn_eps=1e-5, bn_momentum=0.1, deep_stem=True, stem_width=64)
+        if model == "resnet18":
+            print("Load ResNet18")
+            self.feature_extractor = feature_extractor_low.resnet18(pretrained_model, norm_layer=norm_layer, bn_eps=1e-5, bn_momentum=0.1, deep_stem=True, stem_width=64)
+            print("Load Classification Layer")
+            self.fully_connected = classification_fc_layer.ClassificationType("low", dim_fc_out, 0.1)
         
-        print("Load Classification Layer")
-        self.fully_connected = classification_fc_layer.ClassificationType(dim_fc_out, 0.1)
+        elif model == "resnet34":
+            print("Load ResNet34")
+            self.feature_extractor = feature_extractor_low.resnet34(pretrained_model, norm_layer=norm_layer, bn_eps=1e-5, bn_momentum=0.1, deep_stem=True, stem_width=64)
+            print("Load Classification Layer")
+            self.fully_connected = classification_fc_layer.ClassificationType("low", dim_fc_out, 0.1)
+        
+        elif model == "resnet50":
+            print("Load ResNet50")
+            self.feature_extractor = feature_extractor_high.resnet50(pretrained_model, norm_layer=norm_layer, bn_eps=1e-5, bn_momentum=0.1, deep_stem=True, stem_width=64)
+            print("Load Classification Layer")
+            self.fully_connected = classification_fc_layer.ClassificationType("high", dim_fc_out, 0.1)        
 
-        #print(self.feature_extractor)
-        #print(self.fully_connected)
+        elif model == "resnet101":
+            print("Load ResNet101")
+            self.feature_extractor = feature_extractor_high.resnet101(pretrained_model, norm_layer=norm_layer, bn_eps=1e-5, bn_momentum=0.1, deep_stem=True, stem_width=64)
+            print("Load Classification Layer")
+            self.fully_connected = classification_fc_layer.ClassificationType("high", dim_fc_out, 0.1)        
 
+        elif model == "resnet152":
+            print("Load ResNet152")
+            self.feature_extractor = feature_extractor_high.resnet152(pretrained_model, norm_layer=norm_layer, bn_eps=1e-5, bn_momentum=0.1, deep_stem=True, stem_width=64)
+            print("Load Classification Layer")
+            self.fully_connected = classification_fc_layer.ClassificationType("high", dim_fc_out, 0.1)        
+    
     def forward(self, mono, depth):
         blocks, merges = self.feature_extractor(mono, depth)
 

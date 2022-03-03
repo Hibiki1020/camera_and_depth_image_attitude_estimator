@@ -4,10 +4,14 @@ import torch.nn as nn
 import torch.nn.functional as nn_functional
 
 class ClassificationType(nn.Module):
-    def __init__(self, dim_fc_out, dropout_rate):
+    def __init__(self, type, dim_fc_out, dropout_rate):
         super(ClassificationType, self).__init__()
-
-        self.dim_fc_in = 100352
+        if type=="low":
+            self.dim_fc_in = 25088
+        elif type=="high":
+            self.dim_fc_in = 100352
+        
+        
         self.dim_fc_out = dim_fc_out
         self.dropout_rate = dropout_rate
 

@@ -13,11 +13,15 @@ RUN apt-get update && apt-get install -y \
 	wget \
 	unzip \
 	git \
-	build-essential
+	build-essential \
+	libsm6 \
+	libxrender1 \
+	libxext-dev
 
 RUN apt-get update && \
 	apt-get install -y \
-	python3-pip
+	python3-pip \
+	python3-tk
 
 RUN python3 -m pip install -U --force-reinstall pip
 
@@ -41,10 +45,6 @@ RUN pip3 install torchsummary==1.5.1 \
 		matplotlib \
 		pyyaml
 
-RUN apt install -y libsm6 libxrender1 libxext-dev
-
-RUN apt-get install -y python3-tk
-
 ##### NO cache #####
 ARG CACHEBUST=1
 
@@ -52,10 +52,7 @@ RUN mkdir /home/pycode && \
 	mkdir /home/log && \
 	cd /home/pycode && \
     git clone https://github.com/Hibiki1020/mono_and_depth_image_attitude_estimator.git && \
-    cd /home/pycode/mono_and_depth_image_attitude_estimator&& \
-	cd /home/pycode/mono_and_depth_image_attitude_estimator/weights && \
-	wget https://download.pytorch.org/models/resnet101-63fe2227.pth && \
-	cd /home/pycode/mono_and_depth_image_attitude_estimator
+    cd /home/pycode/mono_and_depth_image_attitude_estimator
 
 #RUN apt-get update && apt-get upgrade -y && apt-get -y install gosu
 

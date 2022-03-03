@@ -237,10 +237,10 @@ class DualResNet(nn.Module):
                                        bn_eps=bn_eps, bn_momentum=bn_momentum)
 
         self.sagates = nn.ModuleList([
+            SAGate(in_planes=64, out_planes=64, bn_momentum=bn_momentum),
+            SAGate(in_planes=128, out_planes=128, bn_momentum=bn_momentum),
             SAGate(in_planes=256, out_planes=256, bn_momentum=bn_momentum),
-            SAGate(in_planes=512, out_planes=512, bn_momentum=bn_momentum),
-            SAGate(in_planes=1024, out_planes=1024, bn_momentum=bn_momentum),
-            SAGate(in_planes=2048, out_planes=2048, bn_momentum=bn_momentum)
+            SAGate(in_planes=512, out_planes=512, bn_momentum=bn_momentum)
         ])
 
     def _make_layer(self, number, block, norm_layer, planes, blocks, inplace=True,
@@ -252,9 +252,9 @@ class DualResNet(nn.Module):
         if stride != 1 or self.inplanes != planes * block.expansion:
             if number==1:
                 downsample = nn.Sequential(
-                    nn.Conv2d(64, 256,
+                    nn.Conv2d(64, 64,
                             kernel_size=1, stride=stride, bias=False),
-                    norm_layer(256, eps=bn_eps,
+                    norm_layer(64, eps=bn_eps,
                            momentum=bn_momentum),
                 )
             else:
@@ -320,6 +320,8 @@ class DualResNet(nn.Module):
         #blocks[3], merge[3] is original output in paper of charlesCXK
         #Extract feature map in this class
         return blocks, merges
+
+
 
 def load_dualpath_model(model, model_file, is_restore=False):
     # load raw state_dict
@@ -402,30 +404,6 @@ def resnet18(pretrained_model=None, **kwargs):
 
 def resnet34(pretrained_model=None, **kwargs):
     model = DualResNet(DualBasicBlock, [3, 4, 6, 3], **kwargs)
-
-    if pretrained_model is not None:
-        model = load_dualpath_model(model, pretrained_model)
-    return model
-
-
-def resnet50(pretrained_model=None, **kwargs):
-    model = DualResNet(DualBottleneck, [3, 4, 6, 3], **kwargs)
-
-    if pretrained_model is not None:
-        model = load_dualpath_model(model, pretrained_model)
-    return model
-
-
-def resnet101(pretrained_model=None, **kwargs):
-    model = DualResNet(DualBottleneck, [3, 4, 23, 3], **kwargs)
-
-    if pretrained_model is not None:
-        model = load_dualpath_model(model, pretrained_model)
-    return model
-
-
-def resnet152(pretrained_model=None, **kwargs):
-    model = DualResNet(DualBottleneck, [3, 8, 36, 3], **kwargs)
 
     if pretrained_model is not None:
         model = load_dualpath_model(model, pretrained_model)
