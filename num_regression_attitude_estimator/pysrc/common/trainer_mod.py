@@ -198,7 +198,7 @@ class Trainer:
 
     def saveParam(self):
         #save_path = "../../weights/" + self.str_hyperparameter + ".pth"
-        save_path = self.save_top_path + self.str_hyperparameter + ".pth"
+        save_path = self.save_top_path + "/weights.pth"
         torch.save(self.net.state_dict(), save_path)
         print("Saved: ", save_path)
 
@@ -210,5 +210,5 @@ class Trainer:
         plt.xlabel("Epoch")
         plt.ylabel("Loss [m^2/s^4]")
         plt.title("loss: train=" + str(record_loss_train[-1]) + ", val=" + str(record_loss_val[-1]))
-        graph.savefig(self.save_top_path + self.str_hyperparameter + ".png")
+        graph.savefig(self.save_top_path +  "/graph.png")
         plt.show()

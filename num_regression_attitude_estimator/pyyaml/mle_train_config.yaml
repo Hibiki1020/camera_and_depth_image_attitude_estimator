@@ -1,6 +1,6 @@
 method_name: "regression"
 
-save_top_path: "/home/num_regression_attitude_estimator_log/mle/train_test_08_26/"
+save_top_path: "/home/log/mle_train_2022_03_04/"
 
 train:
   - "/home/strage/rgbd_airsim_image/mono_depth_images_2/image50000"
@@ -9,7 +9,6 @@ train:
 valid:
    - "/home/strage/rgbd_airsim_image/mono_depth_images_2/image25000"
 
-csv_name: "data_list.csv"
 
 multiGPU: 1 #1 is ture
 
@@ -22,7 +21,7 @@ hyperparameter:
   optimizer_name: "Adam"
   lr_cnn: 1e-5
   lr_fc: 1e-5
-  batch_size: 50
+  batch_size: 256
   num_epochs: 50
   dropout_rate: 0.1
   weight_decay: 0.01

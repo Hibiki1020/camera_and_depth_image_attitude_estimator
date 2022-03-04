@@ -1,12 +1,12 @@
 method_name: "frame_infer"
 
-infer_dataset_top_directory: "/home/ssd_dir/airsim_dataset_kawai/Building99/infer_image_range_30_30/dir1_infer_image1000/"
-csv_name: "image_attitude.csv"
+infer_dataset_top_directory: "/home/ssd_dir/rgbd_airsim_image/mono_depth_images_2/inference_image/AirSimNH/inference1000"
+csv_name: "data_list.csv"
 
-weights_top_directory: "/media/amsl/96fde31e-3b9b-4160-8d8a-a4b913579ca21/num_regression_attitude_estimator_log/final_dgx_train_regression/"
+weights_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/regression_train_2022_03_02/"
 weights_file_name: "weights.pth"
 
-infer_log_top_directory: "/home/ssd_dir/num_regression_attitude_estimator_log/infer_log/test_09_14_regression_building/"
+infer_log_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/regression_train_2022_03_02/infer_log/"
 infer_log_file_name: "frame_infer_relust.csv"
 
 resize: 224
