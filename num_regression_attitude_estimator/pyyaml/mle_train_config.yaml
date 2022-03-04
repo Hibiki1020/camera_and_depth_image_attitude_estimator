@@ -9,6 +9,7 @@ train:
 valid:
    - "/home/strage/rgbd_airsim_image/mono_depth_images_2/image25000"
 
+csv_name: "data_list.csv"
 
 multiGPU: 1 #1 is ture
 
