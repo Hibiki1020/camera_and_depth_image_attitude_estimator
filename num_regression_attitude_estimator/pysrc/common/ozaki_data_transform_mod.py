@@ -12,7 +12,7 @@ class DataTransform():
         self.resize = resize
         self.mean = mean
         self.std = std
-        img_transform = transforms.Compose([
+        self.img_transform = transforms.Compose([
             transforms.CenterCrop(original_size),
             transforms.Resize(resize),
             transforms.ToTensor(),
