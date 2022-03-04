@@ -73,7 +73,7 @@ if __name__ == '__main__':
     weight_decay = float(CFG["hyperparameter"]["weight_decay"])
     dim_fc_out = int(CFG["hyperparameter"]["dim_fc_out"])
 
-    shutil.copy('../pyyaml/train_config.yaml', yaml_path)
+    shutil.copy('../../pyyaml/train_config.yaml', yaml_path)
 
     try:
         print("Copy files to %s for further reference." % save_top_path)
