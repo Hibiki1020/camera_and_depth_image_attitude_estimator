@@ -1,4 +1,4 @@
-save_top_path: "/home/log/mono_train_2022_02_26"
+save_top_path: "/home/log/resnet18_2022_03_06"
 weights_path: "/weights"
 log_path: "/log"
 graph_path: "/graph"

@@ -98,6 +98,7 @@ class MLE_Infer:
 
     def get_data(self):
         image_data_list = []
+        depth_data_list = []
         data_list = []
 
         csv_path = os.path.join(self.infer_dataset_top_directory, self.csv_name)
@@ -105,13 +106,18 @@ class MLE_Infer:
         with open(csv_path) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
-                img_path = os.path.join(self.infer_dataset_top_directory, row[0])
-                gt_roll = float(row[4])/3.141592*180.0
-                gt_pitch = float(row[5])/3.141592*180.0
-                gt_yaw = float(row[6])/3.141592*180.0
+                #img_path = os.path.join(self.infer_dataset_top_directory, row[0])
+                img_path = self.infer_dataset_top_directory + "/camera_image/" + row[0]
+                #depth_path = os.path.join(self.infer_dataset_top_directory, row[1])
+                depth_path = self.infer_dataset_top_directory + "/depth_image/" + row[1]
+                gt_roll = float(row[5])/3.141592*180.0
+                gt_pitch = float(row[6])/3.141592*180.0
+
+                #print(img_path)
 
                 image_data_list.append(img_path)
-                tmp_row = [row[0], gt_roll, gt_pitch, gt_yaw]
+                depth_data_list.append(depth_path)
+                tmp_row = [row[0], row[1], gt_roll, gt_pitch]
                 data_list.append(tmp_row)
 
         return image_data_list, data_list
@@ -121,6 +127,9 @@ class MLE_Infer:
 
         result_csv = []
         infer_count = 0
+
+        diff_total_roll = 0.0
+        diff_total_pitch = 0.0
 
         for (img_path, ground_truth) in zip(image_data_list, ground_truth_list):
             print("---------Inference at " + str(infer_count) + "---------")
@@ -139,17 +148,22 @@ class MLE_Infer:
             roll_var = np.var(roll_array)
             pitch_var = np.var(pitch_array)
 
+            diff_roll = np.abs(roll - ground_truth[2])
+            diff_pitch = np.abs(pitch - ground_truth[3])
+
+            diff_total_roll += diff_roll
+            diff_total_pitch += diff_pitch
 
             print("Infered Roll:  " + str(roll) +  "[deg]")
-            print("GT Roll:       " + str(ground_truth[1]) + "[deg]")
+            print("GT Roll:       " + str(ground_truth[2]) + "[deg]")
             print("Infered Pitch: " + str(pitch) + "[deg]")
-            print("GT Pitch:      " + str(ground_truth[2]) + "[deg]")
-            #print("Infered Yaw:   " + str(yaw) + "[deg]")
-            #print("GT Yaw:        " + str(ground_truth[3]) + "[deg]")
+            print("GT Pitch:      " + str(ground_truth[3]) + "[deg]")
+            print("Diff Roll: " + str(diff_roll) + " [deg]")
+            print("Diff Pitch: " + str(diff_pitch) + " [deg]")
 
             #image roll, pitch, GTroll, GTpitch
-            tmp_result = [ground_truth[0], roll, pitch, ground_truth[1], ground_truth[2], roll_var, pitch_var]
-            result_csv.append(tmp_result)
+            tmp_result_csv = [ground_truth[0], ground_truth[1], roll, pitch, ground_truth[2], ground_truth[3], diff_roll, diff_pitch]
+            result_csv.append(tmp_result_csv)
 
             print("Period [s]: ", time.time() - start_clock)
             print("---------------------")
@@ -160,6 +174,9 @@ class MLE_Infer:
             cv2.destroyAllWindows()
             '''
 
+        print("Inference Test Has Done....")
+        print("Average of Error of Roll : " + str(diff_total_roll/float(infer_count)) + " [deg]")
+        print("Average of Error of Pitch: " + str(diff_total_pitch/float(infer_count)) + " [deg]")
         return result_csv
 
     def cvToPIL(self, img_cv):
