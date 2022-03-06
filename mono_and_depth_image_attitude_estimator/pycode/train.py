@@ -315,7 +315,7 @@ if __name__ == '__main__':
     weight_decay = float(CFG["hyperparameter"]["weight_decay"])
     alpha = float(CFG["hyperparameter"]["alpha"])
 
-    shutil.copy('../pyyaml/train_config.yaml', yaml_path)
+    shutil.copy(FLAGS.train_cfg, yaml_path)
 
     '''
     try:
