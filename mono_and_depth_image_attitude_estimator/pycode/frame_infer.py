@@ -37,6 +37,7 @@ class InferenceMod:
         self.weights_top_directory = CFG["weights_top_directory"]
         self.weights_file_name = CFG["weights_file_name"]
         self.weights_path = os.path.join(self.weights_top_directory, self.weights_file_name)
+        self.model = CFG["model"]
         
         self.infer_log_top_directory = CFG["infer_log_top_directory"]
         self.infer_log_file_name = CFG["infer_log_file_name"]
@@ -63,7 +64,7 @@ class InferenceMod:
 
         self.img_transform = self.getImageTransform(self.original_size, self.mean_element, self.std_element, self.resize)
 
-        self.net = self.getNetwork(self.resize, self.weights_path, self.dim_fc_out)
+        self.net = self.getNetwork(self.model, self.resize, self.weights_path, self.dim_fc_out)
 
         if self.enable_dropout == True:
             print("Enable Dropout")
@@ -99,10 +100,11 @@ class InferenceMod:
 
         return img_transform
 
-    def getNetwork(self, resize, weights_path, dim_fc_out):
-        net = network_mod.Network(dim_fc_out, norm_layer=nn.BatchNorm2d,pretrained_model=weights_path)
+    def getNetwork(self, model, resize, weights_path, dim_fc_out):
+        net = network_mod.Network(model, dim_fc_out, norm_layer=nn.BatchNorm2d,pretrained_model=weights_path)
 
         print(net)
+        print("Load ", model)
 
         net.to(self.device)
         net.eval()
