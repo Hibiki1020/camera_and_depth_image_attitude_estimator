@@ -1,4 +1,4 @@
-save_top_path: "/home/log/resnet34_2022_03_08"
+save_top_path: "/home/log/resnet50_2022_03_10"
 weights_path: "/weights"
 log_path: "/log"
 graph_path: "/graph"
@@ -14,12 +14,12 @@ csv_name: "data_list.csv"
 
 index_csv_path: "/home/pycode/mono_and_depth_image_attitude_estimator/index_dict/index_dict_-30_30_range_step1deg.csv"
 
-model: "resnet34" # resnet18 resnet34 resnet50 resnet101 resnet152
+model: "resnet50" # resnet18 resnet34 resnet50 resnet101 resnet152
 
 #ResNet18 34 50 101 152
 #pretrained_model: "/home/weights/resnet18-f37072fd.pth"
-pretrained_model: "/home/weights/resnet34-b627a593.pth"
-#pretrained_model: "/home/weights/resnet50-0676ba61.pth"
+#pretrained_model: "/home/weights/resnet34-b627a593.pth"
+pretrained_model: "/home/weights/resnet50-0676ba61.pth"
 #pretrained_model: "/home/weights/resnet101-63fe2227.pth"
 #pretrained_model: "/home/weights/resnet152-394f9c45.pth"
 
