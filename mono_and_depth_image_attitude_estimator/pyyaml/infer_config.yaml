@@ -1,19 +1,19 @@
-infer_dataset_top_directory: "/home/ssd_dir/rgbd_airsim_image/mono_depth_images_2/inference_image/AirSimNH/inference1000"
-#infer_dataset_top_directory: "/home/ssd_dir/rgbd_airsim_image/mono_depth_images_2/inference_image/Building99/inference1000"
+#infer_dataset_top_directory: "/home/ssd_dir/rgbd_airsim_image/mono_depth_images_2/inference_image/AirSimNH/inference1000"
+infer_dataset_top_directory: "/home/ssd_dir/rgbd_airsim_image/mono_depth_images_2/inference_image/Building99/inference1000"
 csv_name: "data_list.csv"
 
-model: "resnet34" # resnet18 resnet34 resnet50 resnet101 resnet152
-weights_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/resnet34"
+model: "resnet50" # resnet18 resnet34 resnet50 resnet101 resnet152
+weights_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/resnet50"
 weights_file_name: "weights.pth"
 
-infer_log_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/resnet34/infer_log"
-infer_log_file_name: "frame_infer_relust_5frame.csv"
+infer_log_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/resnet50/infer_log"
+infer_log_file_name: "frame_infer_relust_building99.csv"
 
 index_dict_name: "index_dict_-30_30_range_step1deg.csv"
 
 original_size: 672
 window_original_size: 672
-num_windows: 5
+num_windows: 15
 resize: 224
 mean_element: 0.5
 std_element: 0.5
