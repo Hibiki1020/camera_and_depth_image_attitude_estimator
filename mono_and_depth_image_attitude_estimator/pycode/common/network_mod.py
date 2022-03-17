@@ -44,7 +44,7 @@ class Network(nn.Module):
             print("Load ResNet152")
             self.feature_extractor = feature_extractor_high.resnet152(pretrained_model, norm_layer=norm_layer, bn_eps=1e-5, bn_momentum=0.1, deep_stem=True, stem_width=64)
             print("Load Classification Layer")
-            self.fully_connected = classification_fc_layer.ClassificationType("high", dim_fc_out, 0.1)        
+            self.fully_connected = classification_fc_layer.ClassificationType("high", dim_fc_out, 0.1)
     
     def forward(self, mono, depth):
         blocks, merges = self.feature_extractor(mono, depth)
