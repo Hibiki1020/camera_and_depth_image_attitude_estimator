@@ -38,7 +38,7 @@ class Bottleneck(nn.Module):
 
     def forward(self, x):
         # first path
-        x1 = x[0]
+        x1 = x
         residual1 = x1
 
         out1 = self.conv1(x1)
@@ -58,7 +58,7 @@ class Bottleneck(nn.Module):
         out1 += residual1
         out1 = self.relu_inplace(out1)
 
-        return [out1]
+        return out1
 
 class ResNet(nn.Module):
     def __init__(self, block, layers, norm_layer=nn.BatchNorm2d, bn_eps=1e-5,
@@ -164,13 +164,6 @@ def load_model(model, model_file, is_restore=False):
             raw_state_dict = raw_state_dict['model']
     else:
         raw_state_dict = model_file
-
-    if is_restore:
-        new_state_dict = OrderedDict()
-        for k, v in state_dict.items():
-            name = 'module.' + k
-            new_state_dict[name] = v
-        state_dict = new_state_dict
 
     model.load_state_dict(raw_state_dict, strict=False)
 
