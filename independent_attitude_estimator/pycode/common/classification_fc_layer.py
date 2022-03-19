@@ -6,8 +6,8 @@ import torch.nn.functional as nn_functional
 class ClassificationType(nn.Module):
     def __init__(self, type, dim_fc_out, dropout_rate):
         super(ClassificationType, self).__init__()
-        if type=="vgg":
-            self.dim_fc_in = 512 * 7 * 7 * 2
+        if type=="resnet50":
+            self.dim_fc_in = 100352 * 2
         
         self.dim_fc_out = dim_fc_out
         self.dropout_rate = dropout_rate
@@ -45,6 +45,7 @@ class ClassificationType(nn.Module):
             if isinstance(m, nn.Linear):
                 nn.init.kaiming_normal_(m.weight)
 
+    '''
     def getParamValueList(self):
         list_roll_fc_param_value = []
         list_pitch_fc_param_value = []
@@ -54,14 +55,4 @@ class ClassificationType(nn.Module):
                 list_roll_fc_param_value.append(param_value)
             if "pitch_fc" in param_name:
                 list_pitch_fc_param_value.append(param_value)
-
-    def forward(self, feature):
-        roll = self.roll_fc(feature)
-        pitch = self.pitch_fc(feature)
-
-        logged_roll = nn_functional.log_softmax(roll, dim=1)
-        logged_pitch = nn_functional.log_softmax(pitch, dim=1)
-
-        torch.set_printoptions(edgeitems=10000)
-
-        return logged_roll, logged_pitch, roll, pitch
+    '''
