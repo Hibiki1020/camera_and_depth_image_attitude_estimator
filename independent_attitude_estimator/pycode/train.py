@@ -24,6 +24,7 @@ import torch.backends.cudnn as cudnn
 from tensorboardX import SummaryWriter
 
 import sys
+sys.dont_write_bytecode = True
 from common import dataset_mod
 from common import make_datalist_mod
 from common import data_transform_mod
