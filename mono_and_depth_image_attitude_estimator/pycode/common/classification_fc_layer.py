@@ -9,7 +9,7 @@ class ClassificationType(nn.Module):
         if type=="low":
             self.dim_fc_in = 25088
         elif type=="high":
-            self.dim_fc_in = 100352
+            self.dim_fc_in = 100352 #2^11 * 7^2
         
         
         self.dim_fc_out = dim_fc_out
