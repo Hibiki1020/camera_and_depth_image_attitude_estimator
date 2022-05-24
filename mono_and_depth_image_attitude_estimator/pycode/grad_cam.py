@@ -168,7 +168,23 @@ class GradCam:
                 roll[0][roll_ind].backward()
                 pitch[0][pitch_ind].backward()
 
-                alpha = torch.mean(merges[3].grad.view(2048, 7, 7))
+                alpha = torch.mean(merges[3].grad.view(2048, 7*7), 1)
+                feature = feature.view(2048, 7, 7)
+                L = nn_functional.relu(torch.sum(feature*alpha.view(-1, 1,1), 0)).cpu().detach().numpy()
+
+                L_min = np.min(L)
+                L_max = np.max(L)
+                L = (L - L_min)/L_max
+                L = self.toHeatmap(cv2.resize(L, (224, 224)))
+
+                mean = torch.tensor([self.mean_element, self.mean_element, self.mean_element]).view(3,1,1)
+                std = torch.tensor([self.std_element, self.std_element, self.std_element]).view(3,1,1)
+
+                plt.figure(figsize=(10,10))
+                plt.imshow((input_mono*std + mean).permute(1,2,0).cpu().detach().numpy())
+                plt.imshow((input_depth*std + mean).permute(1,2,0).cpu().detach().numpy())
+
+
 
     def toHeatmap(self, x):
         x = (x*255).reshape(-1)
