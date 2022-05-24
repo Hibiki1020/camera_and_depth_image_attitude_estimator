@@ -28,7 +28,7 @@ from torchvision import transforms
 import torch.nn.functional as nn_functional
 
 import sys
-from common import network_mod_grad_cam
+from common import network_mod
 
 class GradCam:
     def __init__(self, CFG):
@@ -89,7 +89,10 @@ class GradCam:
         return img_transform
 
     def getNetwork(self, model, resize, weights_path, dim_fc_out):
-        net = network_mod_grad_cam.Network(model, dim_fc_out, norm_layer=nn.BatchNorm2d,pretrained_model=weights_path)
+        net = network_mod.Network(model, dim_fc_out, norm_layer=nn.BatchNorm2d,pretrained_model=weights_path)
+        self.features = net.feature_extractor
+        self.classifer_roll = net.fully_connected.roll_fc
+        self.classifer_pitch = net.fully_connected.pitch_fc
 
         print(net)
         print("Load ", model)
@@ -151,38 +154,96 @@ class GradCam:
             roll_value_array = []
             pitch_value_array = []
 
+            self.net.eval()
+
             for i in range(self.dim_fc_out):
                 tmp = 0.0
                 roll_hist_array.append(tmp)
                 pitch_hist_array.append(tmp)
 
             for (mono_image, depth_image) in zip(mono_windows, depth_windows):
+
                 input_mono = self.transformImage(mono_image)
                 input_depth = self.transformImage(depth_image)
-                roll_output_array, pitch_output_array, roll, pitch, merges = self.prediction(input_mono, input_depth)
+                logged_roll_inf, logged_pitch_inf, roll, pitch, blocks, merges = self.prediction(input_mono, input_depth)
 
-                merges[3] = merges.clone().detach().requires_grad_(True)
-                roll_ind = roll.argmax(1)
-                pitch_ind = pitch.argmax(1)
+                feature_map_mono = blocks[3][0].clone().detach().requires_grad_(True)
+                feature_map_depth = blocks[3][1].clone().detach().requires_grad_(True)
 
-                roll[0][roll_ind].backward()
-                pitch[0][pitch_ind].backward()
+                roll_ind = int(roll.argmax(1))
+                pitch_ind = int(pitch.argmax(1))
 
-                alpha = torch.mean(merges[3].grad.view(2048, 7*7), 1)
-                feature = feature.view(2048, 7, 7)
-                L = nn_functional.relu(torch.sum(feature*alpha.view(-1, 1,1), 0)).cpu().detach().numpy()
+                roll_loss = torch.mean(torch.sum(-roll*logged_roll_inf, 1))
+                pitch_loss = torch.mean(torch.sum(-pitch*logged_pitch_inf, 1))
+                total_loss = roll_loss + pitch_loss
+                total_loss.backward()
 
-                L_min = np.min(L)
-                L_max = np.max(L)
-                L = (L - L_min)/L_max
-                L = self.toHeatmap(cv2.resize(L, (224, 224)))
+                #roll[0][roll_ind].backward(retain_graph=True)
+                #pitch[0][pitch_ind].backward(retain_graph=True)
+
+                print(type(feature_map_mono.grad))
+                print(feature_map_mono.grad)
+
+                alpha_mono = torch.mean(feature_map_mono.grad.view(2048, 7*7), 1)
+                alpha_depth = torch.mean(feature_map_depth.grad.view(2048, 7*7), 1)
+
+
+                feature_mono = feature_mono.view(2048, 7, 7)
+                feature_depth = feature_depth.view(2048, 7, 7)
+
+                L_mono = nn_functional.relu(torch.sum(feature_mono*alpha_mono.view(-1, 1,1), 0)).cpu().detach().numpy()
+                L_depth = nn_functional.relu(torch.sum(feature_depth*alpha_depth.view(-1, 1,1), 0)).cpu().detach().numpy()
+
+                L_min_mono = np.min(L_mono)
+                L_min_depth = np.min(L_depth)
+                
+                L_max_mono = np.max(L_mono)
+                L_max_depth = np.max(L_depth)
+                
+                L_mono = (L_mono - L_min_mono)/L_max_mono
+                L_depth = (L_depth - L_min_depth)/L_max_depth
+
+
+                L_mono = self.toHeatmap(cv2.resize(L_mono, (224, 224)))
+                L_depth = self.toHeatmap(cv2.resize(L_depth, (224, 224)))
 
                 mean = torch.tensor([self.mean_element, self.mean_element, self.mean_element]).view(3,1,1)
                 std = torch.tensor([self.std_element, self.std_element, self.std_element]).view(3,1,1)
 
+
+                #新規ウインドウ作成
+                fig = plt.figure()
+
+                #flg全体をX*Yに分割し、plot位置に画像を配置する。
+                X = 2
+                Y = 2
+                
+                #imgの表示
+                imgplot = 1
+                ax1 = fig.add_subplot(X, Y, imgplot)
+                ax1.set_title("camera image",fontsize=20)
+                img_mono = (input_mono*std + mean).permute(1,2,0).cpu().detach().numpy()
+                img_mono_L = L_mono
+                alpha_L = 0.3
+                blended_mono = img_mono * alpha_L + img_mono_L * (1-alpha_L)
                 plt.figure(figsize=(10,10))
-                plt.imshow((input_mono*std + mean).permute(1,2,0).cpu().detach().numpy())
-                plt.imshow((input_depth*std + mean).permute(1,2,0).cpu().detach().numpy())
+                plt.imshow(blended_mono)
+
+
+                #imgの表示
+                imgplot = 2
+                ax2 = fig.add_subplot(X, Y, imgplot)
+                ax2.set_title("depth image",fontsize=20)
+                img_depth = (input_depth*std + mean).permute(1,2,0).cpu().detach().numpy()
+                img_depth_L = L_depth
+                alpha_L = 0.3
+                blended_depth = img_depth * alpha_L + img_depth_L * (1-alpha_L)
+                plt.figure(figsize=(10,10))
+                plt.imshow(blended_depth)
+
+                plt.show()
+
+
 
 
 
@@ -292,12 +353,12 @@ class GradCam:
         return mono_windows, depth_windows
 
     def prediction(self, mono_image, depth_image):
-        logged_roll, logged_pitch, roll, pitch, merges = self.net(mono_image, depth_image)
+        logged_roll, logged_pitch, roll, pitch, blocks, merges = self.net(mono_image, depth_image)
 
         output_roll_array = roll.to('cpu').detach().numpy().copy()
         output_pitch_array = pitch.to('cpu').detach().numpy().copy()
 
-        return np.array(output_roll_array), np.array(output_pitch_array),roll, pitch, merges
+        return logged_roll, logged_pitch, roll, pitch, blocks, merges
 
 
 if __name__ == '__main__':
