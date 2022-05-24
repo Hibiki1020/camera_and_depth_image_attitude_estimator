@@ -161,7 +161,14 @@ class GradCam:
                 input_depth = self.transformImage(depth_image)
                 roll_output_array, pitch_output_array, roll, pitch, merges = self.prediction(input_mono, input_depth)
 
-                merges = merges.clone().detach().requires_grad_(True)
+                merges[3] = merges.clone().detach().requires_grad_(True)
+                roll_ind = roll.argmax(1)
+                pitch_ind = pitch.argmax(1)
+
+                roll[0][roll_ind].backward()
+                pitch[0][pitch_ind].backward()
+
+                alpha = torch.mean(merges[3].grad.view(2048, 7, 7))
 
     def toHeatmap(self, x):
         x = (x*255).reshape(-1)
