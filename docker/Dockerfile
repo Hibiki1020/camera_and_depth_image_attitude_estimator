@@ -43,7 +43,8 @@ RUN pip3 install \
 RUN pip3 install torchsummary==1.5.1 \
 		tqdm \
 		matplotlib \
-		pyyaml
+		pyyaml \
+		ttach
 
 ##### NO cache #####
 ARG CACHEBUST=1
