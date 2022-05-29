@@ -341,14 +341,8 @@ class GradCam:
                 grayscale_cam_pitch = grayscale_cam_pitch[0, :]
                 visualization_pitch = show_cam_on_image(vis_image, grayscale_cam_pitch, use_rgb = True)
 
-                """
-                plt.imshow(visualization_roll)
-                plt.imshow(visualization_pitch)
-                plt.show()
-                """
-
                 # create figure
-                fig = plt.figure(figsize=(7, 5))
+                fig = plt.figure(figsize=(6, 3))
   
                 # setting values to rows and column variables
                 rows = 1
