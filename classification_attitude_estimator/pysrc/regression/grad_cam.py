@@ -53,8 +53,7 @@ class GradCam:
 
         self.weights_path = os.path.join(self.weights_top_directory, self.weights_file_name)
 
-        self.infer_log_top_directory = CFG["infer_log_top_directory"]
-        self.infer_log_file_name = CFG["infer_log_file_name"]
+        self.image_save_dir = CFG["image_save_dir"]
 
         self.index_dict_name = CFG["index_dict_name"]
         self.index_dict_path = "../../../index_dict/" + self.index_dict_name
@@ -76,10 +75,9 @@ class GradCam:
         print("Device: ",self.device)
 
         self.img_transform = self.getImageTransform(self.original_size, self.mean_element, self.std_element, self.resize)
-        self.net, self.net_vgg, self.net_roll, self.net_pitch = self.getNetwork(self.resize, self.weights_path, self.dim_fc_out, self.dropout_rate)
+        self.net, self.net_roll, self.net_pitch = self.getNetwork(self.resize, self.weights_path, self.dim_fc_out, self.dropout_rate)
 
         self.target_layer = self.net.cnn_feature
-        self.target_layer_vgg = self.net_vgg.features
         self.target_layer_roll = self.net_roll.features
         self.target_layer_pitch = self.net_pitch.features
 
@@ -137,10 +135,6 @@ class GradCam:
 
         net.load_state_dict(new_state_dict)
 
-        net_vgg = models.vgg16(pretrained=True)
-        net_vgg.to(self.device)
-        net_vgg.eval()
-
         net_roll = models.vgg16(pretrained=False)
         net_roll.features = net.cnn_feature
         net_roll.fc = net.roll_fc
@@ -153,7 +147,7 @@ class GradCam:
         net_pitch.to(self.device)
         net_pitch.eval()
 
-        return net, net_vgg, net_roll, net_pitch
+        return net, net_roll, net_pitch
 
     def spin(self):
         self.image_data_list, self.ground_truth_list = self.get_data()
@@ -363,7 +357,13 @@ class GradCam:
                 plt.axis('off')
                 plt.title("Pitch")
 
-                plt.show()
+                #plt.show()
+
+                image_save_name = self.image_save_dir + "image_" + str(infer_count) + ".png"
+                plt.savefig(image_save_name)
+
+                plt.clf()
+                plt.close()
 
 
 
