@@ -44,7 +44,8 @@ RUN pip3 install torchsummary==1.5.1 \
 		tqdm \
 		matplotlib \
 		pyyaml \
-		ttach
+		ttach \
+		grad-cam
 
 ##### NO cache #####
 ARG CACHEBUST=1
