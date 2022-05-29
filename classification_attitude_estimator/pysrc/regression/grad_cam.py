@@ -323,6 +323,18 @@ class GradCam:
                 input_image = self.transformImage(inference_image)
                 #print(input_image.size())
 
+                roll_output_array, pitch_output_array = self.prediction(input_image)
+
+                tmp_roll = self.array_to_value_simple(roll_output_array)
+                tmp_pitch = self.array_to_value_simple(pitch_output_array)
+
+                diff_roll = np.abs(tmp_roll - ground_truth[2])
+                diff_roll = math.floor(diff_roll * 10 ** 3) / (10 ** 3)
+
+                diff_pitch = np.abs(tmp_pitch - ground_truth[3])
+                diff_pitch = math.floor(diff_pitch * 10 ** 3) / (10 ** 3)
+
+
                 #roll_output_array, pitch_output_array = self.prediction(input_image)
                 vis_image = cv2.resize(window, (224, 224)) / 255.0 #(height, width, channel), [0, 1]
                 label = 0
@@ -344,10 +356,13 @@ class GradCam:
 
                 fig.add_subplot(rows, columns, 1)
 
+                roll_title = "Roll, MAE=" + str(diff_roll)
+                pitch_title = "Pitch, MAE=" + str(diff_pitch)
+
                 # showing image
                 plt.imshow(visualization_roll)
                 plt.axis('off')
-                plt.title("Roll")
+                plt.title(roll_title)
                 
                 # Adds a subplot at the 2nd position
                 fig.add_subplot(rows, columns, 2)
@@ -355,15 +370,18 @@ class GradCam:
                 # showing image
                 plt.imshow(visualization_pitch)
                 plt.axis('off')
-                plt.title("Pitch")
+                plt.title(pitch_title)
 
                 #plt.show()
+
+                
 
                 image_save_name = self.image_save_dir + "image_" + str(infer_count) + ".png"
                 plt.savefig(image_save_name)
 
                 plt.clf()
                 plt.close()
+                
 
 
 
