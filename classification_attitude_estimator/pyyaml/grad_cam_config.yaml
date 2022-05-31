@@ -2,7 +2,11 @@ method_name: "frame_infer"
 
 infer_dataset_top_directory: "/home/ssd_dir/rgbd_airsim_image/mono_depth_images_2/inference_image/AirSimNH/inference1000"
 #infer_dataset_top_directory: "/home/ssd_dir/rgbd_airsim_image/mono_depth_images_2/inference_image/Building99/inference1000"
-csv_name: "data_list.csv"
+#infer_dataset_top_directory: "/home/ssd_dir/dataset_image_to_gravity_ozaki/stick/1cam/20210420_143420/"
+
+#csv_name: "data_list.csv"
+csv_name: "imu_camera.csv"
+
 
 weights_top_directory: "/home/ssd_dir/mono_and_depth_image_attitude_estimator_log/SII2022/classification_train_2022_02_28"
 weights_file_name: "weights.pth"
@@ -12,7 +16,9 @@ image_save_dir: "/home/log/SII2022_Grad_CAM/"
 index_dict_name: "index_dict_-30_30_range_step1deg.csv"
 
 window_original_size: 672
+#window_original_size: 480
 original_size: 672
+#original_size: 480
 window_num: 1
 resize: 224
 mean_element: 0.5

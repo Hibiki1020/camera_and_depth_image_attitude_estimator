@@ -162,6 +162,7 @@ class GradCam:
         with open(csv_path) as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
+                """
                 #img_path = os.path.join(self.infer_dataset_top_directory, row[0])
                 img_path = self.infer_dataset_top_directory + "/camera_image/" + row[0]
                 
@@ -172,6 +173,18 @@ class GradCam:
 
                 image_data_list.append(img_path)
                 tmp_row = [row[0], row[1], gt_roll, gt_pitch]
+                data_list.append(tmp_row)
+                """
+
+                img_path = self.infer_dataset_top_directory + row[3]
+                
+                gt_roll = float(row[0])/3.141592*180.0
+                gt_pitch = float(row[1])/3.141592*180.0
+
+                #print(img_path)
+
+                image_data_list.append(img_path)
+                tmp_row = [row[3], row[3], gt_roll, gt_pitch]
                 data_list.append(tmp_row)
 
         return image_data_list, data_list
@@ -288,6 +301,15 @@ class GradCam:
 
         images = []
 
+        roll_result_list = []
+        pitch_result_list = []
+
+        roll_hist_array = []
+        pitch_hist_array = []
+
+        roll_value_array = []
+        pitch_value_array = []
+
         for (img_path, ground_truth) in zip(image_data_list, ground_truth_list):
             print("---------Inference at " + str(infer_count) + "---------")
             infer_count += 1
@@ -328,12 +350,8 @@ class GradCam:
                 tmp_roll = self.array_to_value_simple(roll_output_array)
                 tmp_pitch = self.array_to_value_simple(pitch_output_array)
 
-                diff_roll = np.abs(tmp_roll - ground_truth[2])
-                diff_roll = math.floor(diff_roll * 10 ** 3) / (10 ** 3)
-
-                diff_pitch = np.abs(tmp_pitch - ground_truth[3])
-                diff_pitch = math.floor(diff_pitch * 10 ** 3) / (10 ** 3)
-
+                roll_hist_array += roll_output_array[0]
+                pitch_hist_array += pitch_output_array[0]
 
                 #roll_output_array, pitch_output_array = self.prediction(input_image)
                 vis_image = cv2.resize(window, (224, 224)) / 255.0 #(height, width, channel), [0, 1]
@@ -346,7 +364,21 @@ class GradCam:
                 grayscale_cam_pitch = self.gradcam_pitch(input_tensor = input_image)
                 grayscale_cam_pitch = grayscale_cam_pitch[0, :]
                 visualization_pitch = show_cam_on_image(vis_image, grayscale_cam_pitch, use_rgb = True)
+                
+                roll_hist_array /= float(len(windows))
+                pitch_hist_array /= float(len(windows))
 
+                roll_hist = self.array_to_value_simple_hist(roll_hist_array)
+                pitch_hist = self.array_to_value_simple_hist(pitch_hist_array)
+
+                roll = roll_hist
+                pitch = pitch_hist
+                
+                diff_roll = np.abs(roll - ground_truth[2])
+                diff_roll_ti = math.floor(diff_roll * 10 ** 3) / (10 ** 3)
+
+                diff_pitch = np.abs(pitch - ground_truth[3])
+                diff_pitch_ti = math.floor(diff_pitch * 10 ** 3) / (10 ** 3)
                 # create figure
                 fig = plt.figure(figsize=(6, 3))
   
@@ -356,8 +388,8 @@ class GradCam:
 
                 fig.add_subplot(rows, columns, 1)
 
-                roll_title = "Roll, MAE=" + str(diff_roll)
-                pitch_title = "Pitch, MAE=" + str(diff_pitch)
+                roll_title = "Roll, MAE=" + str(diff_roll_ti)
+                pitch_title = "Pitch, MAE=" + str(diff_pitch_ti)
 
                 # showing image
                 plt.imshow(visualization_roll)
@@ -381,6 +413,13 @@ class GradCam:
 
                 plt.clf()
                 plt.close()
+
+                print("Infered Roll:  " + str(roll) +  "[deg]")
+                print("GT Roll:       " + str(ground_truth[2]) + "[deg]")
+                print("Infered Pitch: " + str(pitch) + "[deg]")
+                print("GT Pitch:      " + str(ground_truth[3]) + "[deg]")
+                print("Diff Roll: " + str(diff_roll) + " [deg]")
+                print("Diff Pitch: " + str(diff_pitch) + " [deg]")
                 
 
 
